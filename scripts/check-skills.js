@@ -424,7 +424,23 @@ function checkSkill({ dirName, relPath, content }) {
  * @returns {Array<{dirName: string, relPath: string, absPath: string}>}
  */
 function discoverSkills(dir, root) {
-  const rel = (p) => path.relative(root, p).split(path.sep).join("/") || path.basename(p);
+  // Resolve symlinks on BOTH sides before comparing them. A path can reach the
+  // same file by two different routes — macOS makes os.tmpdir() a symlink, and
+  // plenty of people keep a project under one — and path.relative comparing an
+  // unresolved argument against a resolved cwd walks all the way up to the
+  // common ancestor and back down. That turns "alpha/SKILL.md" into a screen of
+  // "../" and makes the report useless exactly when someone is trying to read
+  // it. Resolving both leaves a genuinely outside-root path relative and
+  // readable, which is what a reader wants.
+  const real = (p) => {
+    try {
+      return fs.realpathSync(p);
+    } catch {
+      return p;
+    }
+  };
+  const realRoot = real(root);
+  const rel = (p) => path.relative(realRoot, real(p)).split(path.sep).join("/") || path.basename(p);
   const found = [];
 
   const direct = path.join(dir, "SKILL.md");

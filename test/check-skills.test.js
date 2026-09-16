@@ -402,6 +402,51 @@ test("discoverSkills reports paths with forward slashes on every platform", (t) 
   assert.equal(discoverSkills(dir, dir)[0].relPath, "alpha/SKILL.md");
 });
 
+test("discoverSkills reports a clean path when the root is reached through a symlink", (t) => {
+  // Two routes to the same directory used to produce a screen of "../": the
+  // argument stayed unresolved while the working directory came back resolved,
+  // so path.relative walked up to the common ancestor and back down. macOS hits
+  // this by default — os.tmpdir() is a symlink there, and so are plenty of
+  // people's project directories — and it made the report unreadable exactly
+  // when someone was trying to read it.
+  const dir = makeSkillsDir(t, { alpha: skillMd({ name: "alpha" }) });
+  const linked = path.join(path.dirname(dir), `${path.basename(dir)}-link`);
+  try {
+    fs.symlinkSync(dir, linked, "junction");
+  } catch (err) {
+    // Creating a symlink on Windows needs Developer Mode or elevation. The
+    // behaviour is still covered on macOS and Linux in CI.
+    if (err.code === "EPERM" || err.code === "EACCES") return;
+    throw err;
+  }
+  t.after(() => fs.rmSync(linked, { recursive: true, force: true }));
+
+  // Both directions matter, and each is fixed by resolving a different side.
+  // macOS produces the first: the working directory comes back resolved while
+  // the path typed on the command line does not.
+  assert.deepEqual(
+    discoverSkills(linked, dir).map((s) => s.relPath),
+    ["alpha/SKILL.md"],
+    "scanning through a symlink from a real working directory",
+  );
+  assert.deepEqual(
+    discoverSkills(dir, linked).map((s) => s.relPath),
+    ["alpha/SKILL.md"],
+    "scanning a real path from a working directory reached by a symlink",
+  );
+});
+
+test("discoverSkills still reports a path that genuinely sits outside the root", (t) => {
+  // The symlink fix must not flatten every path to a bare name — a reader
+  // scanning a folder next door needs to see where the file actually is.
+  const dir = makeSkillsDir(t, { alpha: skillMd({ name: "alpha" }) });
+  const root = path.dirname(dir);
+  assert.deepEqual(
+    discoverSkills(dir, root).map((s) => s.relPath),
+    [`${path.basename(dir)}/alpha/SKILL.md`],
+  );
+});
+
 // ─────────────────────────────────────────────────────────────────────────
 // parseArgs
 // ─────────────────────────────────────────────────────────────────────────
