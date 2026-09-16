@@ -73,6 +73,9 @@ npx ai-engineering-cookbook doc-coherence
 
 # Install Prompt Optimizer
 npx ai-engineering-cookbook prompt-optimizer
+
+# Install Skill Review
+npx ai-engineering-cookbook skill-review
 ```
 
 *(You can also run `npx ai-engineering-cookbook` without arguments for an interactive menu that lets you pick a skill **and** select one or more coding-agent environments to install into.)*
@@ -103,6 +106,7 @@ npx ai-engineering-cookbook prompt-optimizer --tool others   # → .coding/, ren
 | :--- | :--- | :--- |
 | **🎯 [Prompt Optimizer](./docs/prompt-optimizer.md)** | Turns vague requests into production-grade prompts — framework selection, model calibration, red-team, scorecard. Optional Claude Code session-start gate. | `npx ai-engineering-cookbook prompt-optimizer` |
 | **🔗 [Doc Coherence](./docs/doc-coherence.md)** | Single-source-of-truth registry + deterministic CI gate that fails the build when one doc restates a fact owned by another. | `npx ai-engineering-cookbook doc-coherence` |
+| **🔍 [Skill Review](./docs/skill-review.md)** | Vets a `SKILL.md` before you install, publish or trust it — spec conformance, portable vs vendor-only fields, and characters a reviewer cannot see. Ships a deterministic CI gate. | `npx ai-engineering-cookbook skill-review` |
 
 ### 🛠️ Troubleshooting & Installation Fallbacks
 
@@ -160,6 +164,7 @@ ai-engineering-cookbook prompt-optimizer
 | **📊 [Evaluation & Observability](./docs/evaluation-and-observability.md)** | Telling whether the model's output was actually good — traces vs. evals. | Golden datasets, judge calibration, OpenTelemetry GenAI |
 | **🛡️ [Agent Security](./docs/agent-security.md)** | Stopping an agent from being turned against you by the text it reads. | Prompt injection, the lethal trifecta, reviewing a skill before you install it, scanning a skill for invisible instructions |
 | **🔗 [Doc Coherence Skill](./docs/doc-coherence.md)** | Single-source-of-truth registry + CI gate that flags cross-doc drift. Install via [Installable Skills](#-installable-skills). | Canonical owners, authority order, deterministic gate |
+| **🔍 [Skill Review Skill](./docs/skill-review.md)** | Checking a `SKILL.md` before you trust it, and writing one that works in every tool. Install via [Installable Skills](#-installable-skills). | The six portable fields, hidden characters, the `check-skills` gate |
 | **🔧 [Troubleshooting](./docs/troubleshooting.md)** | Common failure scenarios and step-by-step fixes. | Install errors, TDD issues, phantom completions |
 | **🧱 [Toolchain & Node Baseline](./docs/toolchain.md)** | Which Node.js version this repo needs, and why every CI tool is pinned. | Node baseline, pinned CI tools, the `check:toolchain` gate |
 | **🔒 [Security Policy](./SECURITY.md)** | What counts as a vulnerability here and how to report one privately. | Private reporting, scope, dry-running an installer |
@@ -184,8 +189,9 @@ Not sure where to begin? Follow this sequence:
 | 8 | **Wondering how agents connect** to tools and data | [Agent Standards](./docs/agent-standards.md) |
 | 9 | **Building a feature that calls a model** and need to score it | [Evaluation & Observability](./docs/evaluation-and-observability.md) |
 | 10 | **About to connect a tool or install a skill** you did not write | [Agent Security](./docs/agent-security.md) |
-| 11 | **Stuck on something** | [Troubleshooting Guide](./docs/troubleshooting.md) |
-| 12 | **Want to contribute** | [Contributing Guide](./CONTRIBUTING.md) |
+| 11 | **Holding a skill file** and wondering whether it is safe and portable | [Skill Review](./docs/skill-review.md) |
+| 12 | **Stuck on something** | [Troubleshooting Guide](./docs/troubleshooting.md) |
+| 13 | **Want to contribute** | [Contributing Guide](./CONTRIBUTING.md) |
 
 ---
 

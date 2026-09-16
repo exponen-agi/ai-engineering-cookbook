@@ -25,7 +25,8 @@ const os = require("node:os");
 const { spawnSync } = require("node:child_process");
 
 const CLI_PATH = path.join(__dirname, "..", "bin", "cli.js");
-const { ENVIRONMENTS, subcommands, parseSelection, exitCodeFor } = require(CLI_PATH);
+const { ENVIRONMENTS, SKILL_MENU, subcommands, parseSelection, resolveMenuChoice, exitCodeFor } =
+  require(CLI_PATH);
 
 /** Run the CLI (or any script) with Node directly — no shell, so Windows is fine. */
 function run(scriptPath, args = []) {
@@ -105,8 +106,8 @@ test("every subcommand points at an installer that exists on disk", () => {
   }
 });
 
-test("both skills are reachable under their short and their install- name", () => {
-  for (const skill of ["doc-coherence", "prompt-optimizer"]) {
+test("every skill is reachable under its short and its install- name", () => {
+  for (const skill of ["doc-coherence", "prompt-optimizer", "skill-review"]) {
     assert.ok(subcommands[skill], `missing short alias for ${skill}`);
     assert.ok(subcommands[`install-${skill}`], `missing install- alias for ${skill}`);
     assert.equal(subcommands[skill], subcommands[`install-${skill}`], `aliases for ${skill} disagree`);
@@ -114,14 +115,64 @@ test("both skills are reachable under their short and their install- name", () =
 });
 
 // ─────────────────────────────────────────────────────────────────────────
+// The interactive skill picker
+//
+// The menu used to live in three places — the printed list, the "[1-3]" in the
+// prompt, and an if/else chain — which is three chances to disagree. It is one
+// table now, and these tests hold the table and the router together.
+// ─────────────────────────────────────────────────────────────────────────
+
+test("every menu entry names a skill the router can actually run", () => {
+  assert.ok(SKILL_MENU.length > 0);
+  for (const entry of SKILL_MENU) {
+    assert.ok(subcommands[entry.skill], `menu offers "${entry.skill}" but no subcommand exists for it`);
+    assert.ok(entry.label.length > 0, `${entry.skill} needs a label`);
+    assert.ok(entry.blurb.length > 0, `${entry.skill} needs a one-line blurb`);
+  }
+});
+
+test("every installable skill appears in the menu", () => {
+  // Otherwise a skill ships that nobody running the bare command can find.
+  const offered = new Set(SKILL_MENU.map((e) => e.skill));
+  for (const name of Object.keys(subcommands)) {
+    if (name.startsWith("install-")) continue;
+    assert.ok(offered.has(name), `"${name}" is installable but missing from the interactive menu`);
+  }
+});
+
+test("resolveMenuChoice maps each number to the skill printed beside it", () => {
+  SKILL_MENU.forEach((entry, i) => {
+    assert.deepEqual(resolveMenuChoice(String(i + 1)), { action: "install", skill: entry.skill });
+  });
+});
+
+test("resolveMenuChoice treats the entry after the last skill as Exit", () => {
+  assert.deepEqual(resolveMenuChoice(String(SKILL_MENU.length + 1)), { action: "exit" });
+  assert.deepEqual(resolveMenuChoice("exit"), { action: "exit" });
+  assert.deepEqual(resolveMenuChoice("EXIT"), { action: "exit" });
+});
+
+test("resolveMenuChoice accepts a skill typed by name", () => {
+  assert.deepEqual(resolveMenuChoice("skill-review"), { action: "install", skill: "skill-review" });
+  assert.deepEqual(resolveMenuChoice("  Doc-Coherence  "), { action: "install", skill: "doc-coherence" });
+});
+
+test("resolveMenuChoice rejects anything else rather than guessing", () => {
+  for (const bad of ["", "   ", "0", "99", "abc", "1.5", "-1", "install"]) {
+    assert.deepEqual(resolveMenuChoice(bad), { action: "invalid" }, `"${bad}" should not resolve`);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────
 // Router behaviour
 // ─────────────────────────────────────────────────────────────────────────
 
-test("--help exits 0 and lists both skills", () => {
+test("--help exits 0 and lists every skill", () => {
   const res = run(CLI_PATH, ["--help"]);
   assert.equal(res.status, 0);
-  assert.match(res.stdout, /doc-coherence/);
-  assert.match(res.stdout, /prompt-optimizer/);
+  for (const entry of SKILL_MENU) {
+    assert.match(res.stdout, new RegExp(entry.skill), `help text never mentions "${entry.skill}"`);
+  }
 });
 
 test("help, -h and --help all behave the same", () => {
