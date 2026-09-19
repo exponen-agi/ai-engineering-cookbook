@@ -143,7 +143,16 @@
     "sandboxed",
     "normalising",
     "Koi",
-    "ToxicSkills"
+    "ToxicSkills",
+    "skillsmp",
+    "clawhub",
+    "Ed25519",
+    "vetter",
+    "skillscan",
+    "untidy",
+    "tokenise",
+    "licence",
+    "recognise"
   ],
   "ignorePaths": [
     "node_modules",

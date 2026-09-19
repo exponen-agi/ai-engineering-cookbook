@@ -26,7 +26,7 @@ Run the full pipeline before you commit. It is the same command CI runs, and it
 works identically on macOS, Windows (PowerShell) and Linux.
 
 ```bash
-npm test && npm run lint:docs && npm run check:toolchain && npm run check:explorer
+npm test && npm run lint:docs && npm run lint:skills && npm run check:toolchain && npm run check:explorer
 ```
 
 ## Rules
@@ -38,6 +38,9 @@ npm test && npm run lint:docs && npm run check:toolchain && npm run check:explor
   and `npm run lint:docs` enforces it.
 - **Do not add a dependency** without maintainer approval — see CLAUDE.md §7.
 - **Every script under `scripts/` that CI depends on needs a test** in `test/`.
+- **Every skill in `skills/` must pass `npm run lint:skills`.** It runs under
+  `--strict`, so a skill published here uses only the six portable frontmatter
+  fields — see [`docs/skill-review.md`](./docs/skill-review.md).
 - **Branch names** follow `<type>/<kebab-slug>`, e.g. `docs/add-faq`.
 
 ---

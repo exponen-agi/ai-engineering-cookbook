@@ -88,6 +88,23 @@ jobs:
       - name: Check the Node baseline and CI tool pins
         run: npm run check:toolchain
 
+  # The repo ships skills that other people install. If one of them drifts out
+  # of the Agent Skills spec — or picks up a character a reviewer cannot see —
+  # that ships to every reader. --strict so portability warnings block too:
+  # a skill published here should work in every tool, not only in Claude Code.
+  skills:
+    name: Agent Skills Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_DEFAULT }}
+
+      - name: Validate every SKILL.md this repo publishes
+        run: npm run lint:skills
+
   build-explorer:
     name: Build Explorer (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
