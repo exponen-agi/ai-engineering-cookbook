@@ -167,8 +167,17 @@ The agent picks a mode from the ask; no flags needed.
 
 ## 🚦 CLI reference
 
+> [!NOTE]
+> **Every `npx` and `npm` command on this page is identical on macOS, Windows and Linux** — type them exactly as written. The only thing that changes between platforms is the path separator when you invoke the gate script directly, shown below.
+
 ```bash
+# macOS and Linux
 node scripts/check-doc-coherence.js [--config <path>] [--root <dir>] [--json] [--quiet]
+```
+
+```powershell
+# Windows (PowerShell) — same command, only the path separator differs
+node scripts\check-doc-coherence.js [--config <path>] [--root <dir>] [--json] [--quiet]
 ```
 
 | Flag | Effect |

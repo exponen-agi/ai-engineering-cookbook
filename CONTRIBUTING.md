@@ -104,7 +104,10 @@ Before opening a PR, confirm all items:
 
 - [ ] `npm test` passes (runs the unit tests for the scripts in `scripts/` — needs Node 22 or newer; no install step required)
 - [ ] `npm run lint:docs` passes (the doc-coherence gate)
+- [ ] `npm run lint:skills` passes (every `SKILL.md` uses only the six portable frontmatter fields — see [Skill Review](./docs/skill-review.md))
+- [ ] `npm run lint:evals` passes (the example eval dataset still passes its own gate — see [Eval Harness](./docs/eval-harness.md))
 - [ ] `npm run check:toolchain` passes (Node baseline and pinned CI tools — see [Toolchain](./docs/toolchain.md))
+- [ ] `npm run check:explorer` passes (if you touched `design/src/`, rebuild with `npm run build:explorer` and commit the bundle)
 - [ ] A new guide is linked from **both** the README table and `index.html` (a test enforces the second)
 - [ ] Spell-checked (no obvious typos)
 - [ ] All links work (internal and external)

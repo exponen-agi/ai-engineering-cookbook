@@ -26,7 +26,7 @@ Run the full pipeline before you commit. It is the same command CI runs, and it
 works identically on macOS, Windows (PowerShell) and Linux.
 
 ```bash
-npm test && npm run lint:docs && npm run lint:skills && npm run check:toolchain && npm run check:explorer
+npm test && npm run lint:docs && npm run lint:skills && npm run lint:evals && npm run check:toolchain && npm run check:explorer
 ```
 
 ## Rules

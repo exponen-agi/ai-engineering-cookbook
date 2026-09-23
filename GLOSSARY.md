@@ -128,7 +128,15 @@ See [Brownfield Workflow Guide](./docs/brownfield.md)
 
 An **eval** is an automated check on the *quality of a model's output*, as opposed to a test that checks whether code runs. It works from a **golden dataset**: a fixed list of inputs paired with what a good answer looks like. Running the eval scores every case, so you can tell whether a prompt or model change made things better or worse. Ten real cases taken from actual failures are worth more than a thousand invented ones.
 
-See [Evaluation & Observability](./docs/evaluation-and-observability.md)
+See [Evaluation & Observability](./docs/evaluation-and-observability.md) · [Eval Harness](./docs/eval-harness.md)
+
+---
+
+## Eval Threshold (Pass Rate)
+
+The fraction of cases in an eval suite that must pass for the build to go green, written as a number between 0 and 1 — `0.9` means "90% of cases must pass". It is what turns a score into a **gate**: without one, the suite reports a number but nothing defines failure. Set it to the pass rate you get today so it catches regressions from day one, and never lower it to make a red build green — that is the same move as deleting a failing test.
+
+See [Eval Harness](./docs/eval-harness.md)
 
 ---
 
@@ -326,6 +334,14 @@ See [Greenfield Guide](./docs/greenfield.md)
 A CLI tool developed by GitHub (`specify-cli`) for AI-assisted planning. It runs a structured workflow (constitution → specify → clarify → plan → tasks) that produces a verifiable `tasks.md` before any code is written. Handles the *"what to build"* half of the workflow.
 
 See [Installation Guide](./docs/installation.md)
+
+---
+
+## Skill Marketplace / Registry
+
+A catalogue that lists Agent Skills (or plugins bundling several) so a user can install them with one command instead of copying files. The important thing to understand is that **listing is not vetting**: registries generally verify only that you control the repository or domain you claim, not that the skill is safe. Skills carrying injected instructions have been found on public registries, so treat one the way you treat an npm package from an author you have never heard of — pin a version rather than fetching fresh, and read it first.
+
+See [Agent Standards](./docs/agent-standards.md) · [Skill Review](./docs/skill-review.md)
 
 ---
 

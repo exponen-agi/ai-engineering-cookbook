@@ -1,0 +1,21 @@
+{
+  "name": "cookbook-skills",
+  "displayName": "AI Engineering Cookbook Skills",
+  "description": "Portable Agent Skills for AI-native development, each paired with a deterministic CI gate that does the part no model should be trusted to judge.",
+  "version": "0.1.1",
+  "author": {
+    "name": "exponen-agi",
+    "url": "https://github.com/exponen-agi"
+  },
+  "homepage": "https://exponen-agi.github.io/ai-engineering-cookbook/",
+  "repository": "https://github.com/exponen-agi/ai-engineering-cookbook",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "evals",
+    "documentation",
+    "prompt-engineering",
+    "spec-driven-development",
+    "ci-gates"
+  ]
+}

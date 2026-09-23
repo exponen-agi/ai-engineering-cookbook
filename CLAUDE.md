@@ -325,7 +325,7 @@ DIRECTIVE 5 — BLAMELESS LEARNING (when errors or failures occur)
 | Framework | N/A — pure Markdown; interactive explorer is pre-built React HTML |
 | Database | N/A |
 | Test runner | `node --test` (`npm test`, built into Node — no deps) for `scripts/` · `markdownlint` (lint) · `markdown-link-check` (broken links) · `cspell` (spell check) |
-| CI command | `npm test && npm run lint:docs && npm run lint:skills && npm run check:toolchain && npm run check:explorer` (the full pipeline also runs markdownlint, markdown-link-check and cspell — see `.github/workflows/docs-ci.yml`) |
+| CI command | `npm test && npm run lint:docs && npm run lint:skills && npm run lint:evals && npm run check:toolchain && npm run check:explorer` (the full pipeline also runs markdownlint, markdown-link-check and cspell — see `.github/workflows/docs-ci.yml`) |
 | Node baseline | Node 22+ (`engines`), developed against `.nvmrc`. Enforced by `npm run check:toolchain`. See `docs/toolchain.md` |
 | Coverage floor | N/A for docs. Every script in `scripts/` that a CI job depends on must have a test file in `test/`. |
 | Protected paths | `design/cookbook-explorer.html` (generated bundle — do not hand-edit; rebuild from `design/src/` via `npm run build:explorer`) |

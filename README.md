@@ -83,6 +83,26 @@ npx ai-engineering-cookbook eval-harness
 
 *(You can also run `npx ai-engineering-cookbook` without arguments for an interactive menu that lets you pick a skill **and** select one or more coding-agent environments to install into.)*
 
+### 📦 Or install all four at once (Claude Code)
+
+This repo is also a **plugin marketplace**, so Claude Code users can take every skill in two commands instead of four:
+
+```text
+/plugin marketplace add exponen-agi/ai-engineering-cookbook
+/plugin install cookbook-skills@ai-engineering-cookbook
+```
+
+The two routes differ in who owns the files, and that is the whole trade-off:
+
+| | `npx ai-engineering-cookbook …` | `/plugin install …` |
+| :--- | :--- | :--- |
+| Where the files land | Your repo, committed by you | Claude Code's plugin cache |
+| Who can edit them | You — they are yours to change | Read-only; edits are overwritten on update |
+| Updates | When you re-run the installer | Managed for you |
+| Works in | Every listed agent (Cursor, Codex, Copilot, …) | Claude Code only |
+
+Use `npx` when you want to adapt a skill to your project. Use the marketplace when you want to subscribe and forget.
+
 ### 🎛️ Choosing your coding-agent environment
 
 Skills are not Claude-only. Run the bare command and the installer asks which agent environment(s) you want — you can **multi-select** by entering comma-separated numbers (e.g. `1,3,5`):
