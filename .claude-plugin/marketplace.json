@@ -1,0 +1,26 @@
+{
+  "name": "ai-engineering-cookbook",
+  "owner": {
+    "name": "exponen-agi",
+    "url": "https://github.com/exponen-agi/ai-engineering-cookbook"
+  },
+  "plugins": [
+    {
+      "name": "cookbook-skills",
+      "source": "./",
+      "displayName": "AI Engineering Cookbook Skills",
+      "description": "Four portable Agent Skills, each backed by a deterministic gate: doc-coherence (single-source-of-truth for docs), prompt-optimizer (production prompt engineering), skill-review (vet a SKILL.md before you trust it), and eval-harness (build an eval suite that can actually fail).",
+      "homepage": "https://exponen-agi.github.io/ai-engineering-cookbook/",
+      "repository": "https://github.com/exponen-agi/ai-engineering-cookbook",
+      "license": "MIT",
+      "keywords": [
+        "skills",
+        "evals",
+        "documentation",
+        "prompt-engineering",
+        "spec-driven-development",
+        "ci-gates"
+      ]
+    }
+  ]
+}

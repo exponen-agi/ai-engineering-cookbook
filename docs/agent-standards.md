@@ -119,7 +119,37 @@ So you can install fifty skills and pay for only the fifty descriptions until on
 > [!IMPORTANT]
 > The `description` field is doing the real work. It is the only thing the agent sees when deciding whether to use your skill. Write it as *"Do X. Use when the user asks for Y or Z."* — name the trigger words a user would actually type.
 
-**This repository ships two skills** you can install into your own project — see [Installable Skills](../README.md#-installable-skills). The same `SKILL.md` file works in Claude Code, Cursor, Codex, Copilot, Roo Code and Antigravity; only the install folder differs.
+**This repository ships four skills** you can install into your own project — see [Installable Skills](../README.md#-installable-skills). The same `SKILL.md` file works in Claude Code, Cursor, Codex, Copilot, Roo Code and Antigravity; only the install folder differs.
+
+### How skills get distributed
+
+Writing a skill is half the problem; getting it onto a machine is the other half. By 2026 four routes are in common use, and they differ mainly in **who owns the files afterwards**.
+
+```text
+                        ┌─────────────────────────────┐
+  you copy the file  ──►│  YOU OWN IT                 │
+  (git, npx installer)  │  editable, pinned, reviewed │
+                        │  you update it yourself     │
+                        └─────────────────────────────┘
+
+                        ┌─────────────────────────────┐
+  you subscribe      ──►│  THE PUBLISHER OWNS IT      │
+  (plugin marketplace)  │  read-only, auto-updating   │
+                        │  it can change under you    │
+                        └─────────────────────────────┘
+```
+
+| Route | What it looks like | Owns the files |
+| :--- | :--- | :--- |
+| **Copy into your repo** | A `SKILL.md` committed alongside your code, often placed by an installer such as this repo's `npx ai-engineering-cookbook …` | You |
+| **Plugin marketplace** | A manifest listing several plugins; a user adds the marketplace, then installs from it. This repo publishes one — see [Installable Skills](../README.md#-installable-skills) | The publisher |
+| **A skills CLI** | A general-purpose installer that pulls a skill from any git host into whichever agent folder you use | You |
+| **Served over MCP** | An MCP server exposes skills as resources instead of files on disk, so a whole team gets the same version without anyone installing anything | The server operator |
+
+The fourth route is the newest: an official MCP **Skills extension** was finalised in September 2026 against the `2026-07-28` base protocol revision, letting a server publish skills rather than every developer downloading them. It is worth knowing the direction of travel, but check the current specification before building on it — this area is moving quickly.
+
+> [!CAUTION]
+> **Listing is not vetting.** No major skill registry reviews what it hosts; most check only that you control the domain or repository you claim. Trojanised MCP servers and skills carrying injected instructions have both been found in the wild. Pin a version rather than fetching fresh on every run, and read the file before you trust it — [Skill Review](./skill-review.md) is the checklist, and [Agent Security](./agent-security.md) explains the attacks.
 
 ### AGENTS.md or a skill? — a decision table
 
