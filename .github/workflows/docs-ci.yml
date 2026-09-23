@@ -105,6 +105,23 @@ jobs:
       - name: Validate every SKILL.md this repo publishes
         run: npm run lint:skills
 
+  # The eval-harness skill tells readers to copy templates/evals/ as their
+  # starting point. An example that does not pass its own gate would teach the
+  # wrong shape to everyone who copies it, so the example is checked here under
+  # --strict — the same bar the skill asks readers to hold themselves to.
+  evals:
+    name: Eval Dataset Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_DEFAULT }}
+
+      - name: Validate the example eval dataset
+        run: npm run lint:evals
+
   build-explorer:
     name: Build Explorer (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

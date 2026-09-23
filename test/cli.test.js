@@ -24,7 +24,8 @@ const fs = require("node:fs");
 const os = require("node:os");
 const { spawnSync } = require("node:child_process");
 
-const CLI_PATH = path.join(__dirname, "..", "bin", "cli.js");
+const REPO_ROOT = path.join(__dirname, "..");
+const CLI_PATH = path.join(REPO_ROOT, "bin", "cli.js");
 const { ENVIRONMENTS, SKILL_MENU, subcommands, parseSelection, resolveMenuChoice, exitCodeFor } =
   require(CLI_PATH);
 
@@ -107,7 +108,17 @@ test("every subcommand points at an installer that exists on disk", () => {
 });
 
 test("every skill is reachable under its short and its install- name", () => {
-  for (const skill of ["doc-coherence", "prompt-optimizer", "skill-review"]) {
+  // Read the shipped skills rather than restating them. A hardcoded list here
+  // silently stops covering the newest skill the moment one is added — which
+  // is the same drift the CLI's own SKILL_MENU comment warns about.
+  const shipped = fs
+    .readdirSync(path.join(REPO_ROOT, "skills"), { withFileTypes: true })
+    .filter((e) => e.isDirectory() && fs.existsSync(path.join(REPO_ROOT, "skills", e.name, "SKILL.md")))
+    .map((e) => e.name);
+
+  assert.ok(shipped.length > 0, "no skills found under skills/");
+
+  for (const skill of shipped) {
     assert.ok(subcommands[skill], `missing short alias for ${skill}`);
     assert.ok(subcommands[`install-${skill}`], `missing install- alias for ${skill}`);
     assert.equal(subcommands[skill], subcommands[`install-${skill}`], `aliases for ${skill} disagree`);

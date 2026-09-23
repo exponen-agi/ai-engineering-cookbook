@@ -76,6 +76,9 @@ npx ai-engineering-cookbook prompt-optimizer
 
 # Install Skill Review
 npx ai-engineering-cookbook skill-review
+
+# Install Eval Harness
+npx ai-engineering-cookbook eval-harness
 ```
 
 *(You can also run `npx ai-engineering-cookbook` without arguments for an interactive menu that lets you pick a skill **and** select one or more coding-agent environments to install into.)*
@@ -107,6 +110,7 @@ npx ai-engineering-cookbook prompt-optimizer --tool others   # → .coding/, ren
 | **🎯 [Prompt Optimizer](./docs/prompt-optimizer.md)** | Turns vague requests into production-grade prompts — framework selection, model calibration, red-team, scorecard. Optional Claude Code session-start gate. | `npx ai-engineering-cookbook prompt-optimizer` |
 | **🔗 [Doc Coherence](./docs/doc-coherence.md)** | Single-source-of-truth registry + deterministic CI gate that fails the build when one doc restates a fact owned by another. | `npx ai-engineering-cookbook doc-coherence` |
 | **🔍 [Skill Review](./docs/skill-review.md)** | Vets a `SKILL.md` before you install, publish or trust it — spec conformance, portable vs vendor-only fields, and characters a reviewer cannot see. Ships a deterministic CI gate. | `npx ai-engineering-cookbook skill-review` |
+| **📊 [Eval Harness](./docs/eval-harness.md)** | Builds an eval suite that can actually fail — golden dataset, cheapest-scorer ladder, pass-rate threshold. Ships a deterministic CI gate that catches a suite which silently passes everything. | `npx ai-engineering-cookbook eval-harness` |
 
 ### 🛠️ Troubleshooting & Installation Fallbacks
 
@@ -162,6 +166,7 @@ ai-engineering-cookbook prompt-optimizer
 | **🧭 [Context Engineering](./docs/context-engineering.md)** | The 6 Context-Engine principles mapped honestly to this repo's mechanisms. | Conflict resolution, token optimization, scope boundaries |
 | **🔌 [Agent Standards](./docs/agent-standards.md)** | The three open standards every 2026 agent reads: AGENTS.md, Agent Skills, and MCP. | Progressive disclosure, stateless MCP, per-platform config paths |
 | **📊 [Evaluation & Observability](./docs/evaluation-and-observability.md)** | Telling whether the model's output was actually good — traces vs. evals. | Golden datasets, judge calibration, OpenTelemetry GenAI |
+| **🧪 [Eval Harness Skill](./docs/eval-harness.md)** | Building the eval suite itself, and proving it can fail. Install via [Installable Skills](#-installable-skills). | Dataset design, scorer ladder, thresholds, the `check-evals` gate |
 | **🛡️ [Agent Security](./docs/agent-security.md)** | Stopping an agent from being turned against you by the text it reads. | Prompt injection, the lethal trifecta, reviewing a skill before you install it, scanning a skill for invisible instructions |
 | **🔗 [Doc Coherence Skill](./docs/doc-coherence.md)** | Single-source-of-truth registry + CI gate that flags cross-doc drift. Install via [Installable Skills](#-installable-skills). | Canonical owners, authority order, deterministic gate |
 | **🔍 [Skill Review Skill](./docs/skill-review.md)** | Checking a `SKILL.md` before you trust it, and writing one that works in every tool. Install via [Installable Skills](#-installable-skills). | The six portable fields, hidden characters, the `check-skills` gate |
@@ -188,10 +193,11 @@ Not sure where to begin? Follow this sequence:
 | 7 | **Want a sharper prompt** before starting work | [Prompt Optimizer Skill](./docs/prompt-optimizer.md) |
 | 8 | **Wondering how agents connect** to tools and data | [Agent Standards](./docs/agent-standards.md) |
 | 9 | **Building a feature that calls a model** and need to score it | [Evaluation & Observability](./docs/evaluation-and-observability.md) |
-| 10 | **About to connect a tool or install a skill** you did not write | [Agent Security](./docs/agent-security.md) |
-| 11 | **Holding a skill file** and wondering whether it is safe and portable | [Skill Review](./docs/skill-review.md) |
-| 12 | **Stuck on something** | [Troubleshooting Guide](./docs/troubleshooting.md) |
-| 13 | **Want to contribute** | [Contributing Guide](./CONTRIBUTING.md) |
+| 10 | **Ready to write the eval suite** and make it block bad merges | [Eval Harness](./docs/eval-harness.md) |
+| 11 | **About to connect a tool or install a skill** you did not write | [Agent Security](./docs/agent-security.md) |
+| 12 | **Holding a skill file** and wondering whether it is safe and portable | [Skill Review](./docs/skill-review.md) |
+| 13 | **Stuck on something** | [Troubleshooting Guide](./docs/troubleshooting.md) |
+| 14 | **Want to contribute** | [Contributing Guide](./CONTRIBUTING.md) |
 
 ---
 
