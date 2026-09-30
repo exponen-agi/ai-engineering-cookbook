@@ -264,6 +264,31 @@ Select-String -Path "$SkillDir\*" -Recurse `
 
 Skills installed by this cookbook land in a folder you control and are committed to your repo, so steps 1–6 are all you need — see [Agent Standards](./agent-standards.md) for where each tool stores them.
 
+> [!TIP]
+> **Steps 1–5 now have a script.** The two commands above are a hand-rolled version of [`check-skills`](./skill-review.md), which reads every file in the skill folder, applies the same patterns on all three platforms, and adds the invisible-character scan below. Run `node scripts/check-skills.js <skill-folder>` and read the report, then do the human half. The script is not a replacement for step 1.
+
+### Step 6 is the one people skip: updates
+
+First-install review gets all the attention, and it is the easier half. An
+**update** replaces natural-language instructions that run inside a privileged
+context, and it usually arrives with no diff in front of anybody.
+
+There is still **no cryptographic signing standard for skills**. Several
+proposals exist and none has won, so there is currently no way to verify that
+the skill you hold is the one its author published. Until that changes, the
+only thing making your review durable is that the file cannot change
+afterwards:
+
+| Do this | Instead of | Because |
+| :--- | :--- | :--- |
+| Copy the skill into your repo and commit it | Referencing it from a registry | A referenced skill can be replaced upstream |
+| Pin to a commit SHA | Pinning to a branch or tag | A branch moves; a tag can be re-pointed |
+| Read the diff on every update | Running `update` and moving on | An update is a new skill wearing an old name |
+| Update deliberately, by hand | Auto-updating skills in CI | An unattended update is an unreviewed one |
+
+This is AST07 (update drift) and AST02 (supply chain compromise), and it is
+where most real-world loss happens — not at the moment of first install.
+
 ---
 
 ## 🕳️ The step the checklist above still misses: text you cannot see

@@ -119,7 +119,40 @@ So you can install fifty skills and pay for only the fifty descriptions until on
 > [!IMPORTANT]
 > The `description` field is doing the real work. It is the only thing the agent sees when deciding whether to use your skill. Write it as *"Do X. Use when the user asks for Y or Z."* — name the trigger words a user would actually type.
 
-**This repository ships two skills** you can install into your own project — see [Installable Skills](../README.md#-installable-skills). The same `SKILL.md` file works in Claude Code, Cursor, Codex, Copilot, Roo Code and Antigravity; only the install folder differs.
+Stage 3 is where the security problem lives.
+
+> [!WARNING]
+> Stage 3 is the half nobody reviews. A registry listing shows you `SKILL.md`; the `scripts/` folder beside it is what actually runs, with all of your permissions. Before you install a skill you did not write, review the **folder**, not the page — see [Skill Review](./skill-review.md).
+
+### Where skills go — `.agents/skills/` is now the shared folder
+
+This changed during 2026 and a lot of older guides have it wrong.
+
+Skills used to live in a folder named after whichever tool you used. That meant installing the same skill five times if your team used five editors. Most agents now also read a **vendor-neutral** folder, so one copy serves all of them:
+
+```text
+your-project/
+├── .agents/skills/            ← read by Codex, Cursor, Copilot, Gemini CLI,
+│   └── my-skill/SKILL.md        Amp, OpenCode, Droid, Cline, Zed and more
+│
+├── .claude/skills/            ← Claude Code reads only this one
+│   └── my-skill/SKILL.md
+│
+└── .cursor/skills/            ← still read by Cursor, alongside .agents/
+    └── my-skill/SKILL.md
+```
+
+| Rule of thumb | What to do |
+| :--- | :--- |
+| You use several agents | Put the skill in `.agents/skills/` once |
+| You use Claude Code | It reads only `.claude/skills/`, so install there too |
+| You use Codex | Use `.agents/skills/`. Codex does **not** read a `.codex/skills/` folder |
+| A skill is only for you, not the repo | Use the user-level folder (`~/.agents/skills/`) so it is not committed |
+
+> [!NOTE]
+> **Two copies of one skill is a real problem, not a tidiness issue.** Some agents load every skills folder they know about. Leave the same `name` in two of them and the agent may pick either, which makes behaviour depend on directory order. If you move a skill, delete the old copy.
+
+**This repository ships installable skills** you can drop into your own project — see [Installable Skills](../README.md#-installable-skills). The same `SKILL.md` file works in Claude Code, Cursor, Codex, Copilot, Roo Code and Antigravity; only the install folder differs.
 
 ### AGENTS.md or a skill? — a decision table
 
@@ -240,8 +273,10 @@ Agent configuration lives in different places on macOS, Windows and Linux. Use t
 | What | macOS / Linux | Windows (PowerShell) |
 | :--- | :--- | :--- |
 | Project rules | `./AGENTS.md` | `.\AGENTS.md` |
+| Project skills (most agents) | `./.agents/skills/` | `.\.agents\skills\` |
 | Project skills (Claude Code) | `./.claude/skills/` | `.\.claude\skills\` |
 | Project skills (Cursor) | `./.cursor/skills/` | `.\.cursor\skills\` |
+| User-level skills (most agents) | `~/.agents/skills/` | `%USERPROFILE%\.agents\skills\` |
 | User-level agent config | `~/.claude/` | `%USERPROFILE%\.claude\` |
 | VS Code / Copilot user config | `~/.config/Code/User/` | `%APPDATA%\Code\User\` |
 

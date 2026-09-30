@@ -33,6 +33,7 @@ function flag(name) {
 const opts = {
   config: flag("--config"),
   root: path.resolve(flag("--root") || process.cwd()),
+  strict: args.includes("--strict"),
   json: args.includes("--json"),
   quiet: args.includes("--quiet"),
   help: args.includes("-h") || args.includes("--help"),
@@ -43,9 +44,15 @@ if (opts.help) {
     [
       "check-doc-coherence — enforce single-source-of-truth across markdown docs",
       "",
-      "Usage: node scripts/check-doc-coherence.js [--config <path>] [--root <dir>] [--json] [--quiet]",
+      "Usage: node scripts/check-doc-coherence.js [--config <path>] [--root <dir>] [--strict] [--json] [--quiet]",
       "",
-      "Exit codes: 0 clean | 1 drift found | 2 config/usage error",
+      "  --strict  Also fail when the registry itself has gone stale — an owner",
+      "            file that moved, an anchor that no longer exists, a marker",
+      "            sentence that was reworded. Without it those are advisory,",
+      "            and a fact can stop protecting anything without the build",
+      "            noticing.",
+      "",
+      "Exit codes: 0 clean | 1 drift found (or, with --strict, a stale registry) | 2 config/usage error",
     ].join("\n") + "\n",
   );
   process.exit(0);
@@ -216,5 +223,25 @@ if (opts.json) {
   }
 }
 
-// config warnings are advisory (exit 0); real drift fails the gate
-process.exit(violations.length ? 1 : 0);
+// Real drift always fails the gate.
+//
+// A registry warning means something quieter and, in the long run, worse: the
+// fact is no longer being enforced at all. Reword a marker sentence in the
+// owning document and the gate prints "marker not found in owner", then exits
+// 0 — so the check goes green while protecting nothing, and nobody finds out
+// until two documents have already disagreed for a month.
+//
+// It stays advisory by default, because a registry someone else wrote should
+// not break their build the first time they run this. `--strict` is for a
+// repository that has decided to keep its own registry honest, and that is
+// how this repo runs it in CI.
+const failed = violations.length > 0 || (opts.strict && configWarnings.length > 0);
+
+if (opts.strict && configWarnings.length && !opts.json) {
+  process.stdout.write(
+    `✗ doc-coherence: ${configWarnings.length} registry warning(s) under --strict. ` +
+      "Each one means a declared fact is no longer being checked.\n",
+  );
+}
+
+process.exit(failed ? 1 : 0);

@@ -35,12 +35,21 @@ npm test && npm run lint:docs && npm run lint:skills && npm run check:toolchain 
   `design/src/` and run `npm run build:explorer`; CI fails on drift.
 - **Never restate a fact another document owns.** Link to it instead. The
   registry is [`templates/coherence.config.json`](./templates/coherence.config.json)
-  and `npm run lint:docs` enforces it.
+  and `npm run lint:docs` enforces it. It runs under `--strict`, so rewording a
+  marker sentence in an owning document fails the build instead of quietly
+  switching that fact's protection off.
 - **Do not add a dependency** without maintainer approval — see CLAUDE.md §7.
 - **Every script under `scripts/` that CI depends on needs a test** in `test/`.
 - **Every skill in `skills/` must pass `npm run lint:skills`.** It runs under
   `--strict`, so a skill published here uses only the six portable frontmatter
-  fields — see [`docs/skill-review.md`](./docs/skill-review.md).
+  fields — see [`docs/skill-review.md`](./docs/skill-review.md). The gate reads
+  the whole skill folder, so a bundled script is checked too. To quote an
+  attack in a document without failing the build, put
+  `check-skills-allow: <rule-id>` on that line or the line above it.
+- **Where a skill installs to lives in one table:**
+  [`bin/tool-profiles.js`](./bin/tool-profiles.js). Do not add a second copy to
+  an installer — that table used to exist four times and had already drifted.
+  Every path in it carries the vendor documentation it was verified against.
 - **Branch names** follow `<type>/<kebab-slug>`, e.g. `docs/add-faq`.
 
 ---
