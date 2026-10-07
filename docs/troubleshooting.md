@@ -77,7 +77,7 @@ $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";"
 
 ---
 
-### ❓ Superpowers plugin not activating in the agent
+### ❓ Superpowers plugin not activating in the agent (optional plugin)
 
 **Symptom:** Agent doesn't respond to `/sp-status` or Superpowers skills like `using-git-worktrees` don't trigger.
 
@@ -98,9 +98,9 @@ $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";"
 
 ### ❓ The agent created a new git branch instead of using the existing one
 
-**Symptom:** After pasting the handoff message, you see a new branch like `feat/my-feature-2` when `001-my-feature` already existed.
+**Symptom:** After running `/speckit-implement`, you see a new branch like `feat/my-feature-2` when `001-my-feature` already existed.
 
-**Cause:** The handoff message was missing the constraint `Do not create a new git branch`. The agent defaulted to its own branching behavior.
+**Cause:** The constraints passed to `/speckit-implement` were missing `Do not create a new git branch`. The agent defaulted to its own branching behavior.
 
 **Fix:** Checkout the correct branch manually and delete the duplicate:
 
@@ -109,9 +109,9 @@ git checkout 001-my-feature
 git branch -D feat/my-feature-2
 ```
 
-Then re-paste the handoff message with all constraints included.
+Then re-run `/speckit-implement` with all constraints included.
 
-**Prevention:** Always include `Do not create a new git branch (already created by Spec-Kit)` in your handoff message.
+**Prevention:** Always include `Do not create a new git branch (already created by Spec-Kit)` in your `/speckit-implement` constraints — or, better, in your constitution.
 
 ---
 
@@ -132,7 +132,7 @@ Then re-paste the handoff message with all constraints included.
 
 **Symptom:** `spec.md` looks completely different from what Spec-Kit generated.
 
-**Cause:** The agent wasn't given the handoff message and decided to plan from scratch.
+**Cause:** The agent was asked to implement without the handoff constraints (`Do not generate a new plan`), or a second tool was asked to plan the same feature, and it decided to plan from scratch.
 
 **Fix:** Restore the original `spec.md` from git:
 
@@ -140,7 +140,7 @@ Then re-paste the handoff message with all constraints included.
 git checkout HEAD -- .specify/specs/<feature>/spec.md
 ```
 
-Then re-paste the correct handoff message.
+Then re-run `/speckit-implement` with the handoff constraints.
 
 ---
 
@@ -154,7 +154,7 @@ Then re-paste the correct handoff message.
 
 1. Run `git log --oneline` to see how many commits actually exist for the feature.
 2. Uncheck all tasks that have no matching commit: edit `tasks.md` and change `[x]` back to `[ ]`.
-3. Re-run the handoff with an explicit instruction: `For each task, you MUST write a git commit before marking it complete.`
+3. Re-run `/speckit-implement` with an explicit instruction: `For each task, you MUST write a git commit before marking it complete.`
 
 **Prevention:** Use the `Verify Tasks` extension after implementation — it cross-references `tasks.md` checkboxes against actual commits.
 
@@ -166,7 +166,7 @@ Then re-paste the correct handoff message.
 
 **Cause:** You didn't run `/speckit-tasks` after `/speckit-plan`.
 
-**Fix:** Run `/speckit-tasks` — it converts the plan into the checkbox checklist. Don't paste the handoff message until `tasks.md` exists.
+**Fix:** Run `/speckit-tasks` — it converts the plan into the checkbox checklist. Don't run `/speckit-implement` until `tasks.md` exists.
 
 ---
 
@@ -186,11 +186,11 @@ Then re-paste the correct handoff message.
 
 **Symptom:** You see implementation code commits before any test commits.
 
-**Cause:** The TDD constraint wasn't clear enough in the handoff message.
+**Cause:** The TDD constraint wasn't clear enough in the `/speckit-implement` constraints.
 
 **Fix:** Interrupt the agent and say: `Stop. Roll back to before the implementation. Write the failing test first, confirm it fails, then write the implementation.`
 
-**Prevention:** Include `Write tests before implementation code (TDD). The test MUST fail before you write any implementation.` in your handoff message.
+**Prevention:** Include `Write tests before implementation code (TDD). The test MUST fail before you write any implementation.` in your `/speckit-implement` constraints — or, better, in your constitution.
 
 ---
 

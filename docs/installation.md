@@ -1,6 +1,6 @@
 # Installation and Setup Guide
 
-This guide walks you through setting up the AI-Native SDLC environment on your machine. We will set up **Spec-Kit** for planning and **Superpowers** for execution.
+This guide walks you through setting up the AI-Native SDLC environment on your machine. We will set up **Spec-Kit**, which plans, implements and checks its own work, and optionally **Superpowers** for stricter TDD discipline.
 
 ---
 
@@ -86,7 +86,14 @@ specify --version
 
 ---
 
-### 3. Install Superpowers
+### 3. Optional: Superpowers TDD discipline
+
+You can skip this step. Spec-Kit's `/speckit-implement` and `/speckit-converge`
+already run the full loop. [Superpowers](https://github.com/obra/superpowers) is
+a plugin of skills — `test-driven-development`, `using-git-worktrees`,
+`requesting-code-review` and others — that trigger **inside**
+`/speckit-implement` and make the TDD loop harder to skip. It is a discipline
+layer, not a second executor: see [Which executor runs the tasks?](#which-executor-runs-the-tasks).
 
 Superpowers is installed directly inside your AI coding agent (e.g. Claude Code, Cursor, Gemini CLI).
 
@@ -265,14 +272,18 @@ constitution    clarify              checklist          analyze
 > (`specify extension add assess`). See the
 > [Spec-Kit repository](https://github.com/github/spec-kit) for what each adds.
 
-**Which executor runs the tasks?**
+### Which executor runs the tasks?
+
+**Spec-Kit does.** `/speckit-implement` executes `tasks.md` and
+`/speckit-converge` checks the result against the spec, appending tasks until it
+reports *Converged* — a complete loop on its own. This cookbook uses that loop
+for every feature.
 
 > [!WARNING]
-> **`/speckit-implement` overlaps with this cookbook's handoff model.** This
-> cookbook hands `tasks.md` to Superpowers for the TDD execution loop — see
-> [Greenfield](./greenfield.md). Spec-Kit can now also execute tasks itself. Both
-> work; using both at once on the same feature does not. Pick one executor per
-> feature and say which in your constitution.
+> **One executor per feature.** If you install Superpowers, use it only for the
+> discipline skills that trigger inside `/speckit-implement` (TDD, worktrees,
+> code review). Do not also ask it to write or execute its own plan for the same
+> feature: two planners on one `tasks.md` disagree, and both are confident.
 
 ---
 

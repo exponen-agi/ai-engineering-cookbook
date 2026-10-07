@@ -1,7 +1,7 @@
 # Agent Profile Roles
 
 > **What this file is:** A team-filled template that defines the multi-agent pod structure for this project.
-> Each role maps to specific Spec-Kit commands and Superpowers skills.
+> Each role maps to specific Spec-Kit commands (and, optionally, Superpowers skills).
 >
 > **When to update:** When a new agent joins the pipeline, when role responsibilities shift,
 > or when a postmortem reveals a handoff gap between roles.
@@ -17,9 +17,9 @@
 |---|---|---|
 | Planner | Spec authorship and clarification | `/speckit-specify`, `/speckit-clarify` |
 | Orchestrator | Workflow routing and handoff | Session startup, task transitions |
-| Coder | Implementation (TDD loop) | `subagent-driven-development` skill |
-| Reviewer | Spec compliance + code quality | `requesting-code-review` skill |
-| Verifier | Post-task and pre-merge gates | `verification-before-completion` skill |
+| Coder | Implementation (TDD loop) | `/speckit-implement` |
+| Reviewer | Spec compliance + code quality | `/speckit-converge`, then code review |
+| Verifier | Post-task and pre-merge gates | All tasks done and converged |
 
 ---
 
@@ -50,7 +50,7 @@
 **Responsibilities:**
 - Load context at session start (§ Context Mapping in CLAUDE.md)
 - Route tasks to the correct role
-- Enforce the Spec-Kit → Superpowers handoff boundary
+- Enforce the planning → execution handoff boundary (Spec-Kit is the only executor)
 - Detect when a role is blocked and escalate to the user
 
 **Reads (inputs):**
@@ -60,11 +60,11 @@
 - `.specify/specs/<feature>/tasks.md`
 
 **Produces (outputs):**
-- Handoff messages to Coder (see docs/greenfield.md or docs/brownfield.md)
+- `/speckit-implement` runs with the handoff constraints (see docs/greenfield.md or docs/brownfield.md)
 - Escalation notices to the user when gates fail
 
 **Handoff protocol:**
-- Issue the standard handoff message (see docs/greenfield.md or docs/brownfield.md) when `tasks.md` is confirmed ready
+- Run `/speckit-implement` with the standard handoff constraints (see docs/greenfield.md or docs/brownfield.md) when `tasks.md` is confirmed ready
 - After each task cycle, confirm Coder has appended to `.ai/traces/AGENT_LOG_REFLECTIONS.md`
 
 ---
@@ -131,20 +131,23 @@
 **Produces (outputs):**
 - Gate pass/fail report
 - If fail: entry in `postmortems/POSTMORTEM_AND_LEARNING_LOG.md`
-- If pass: green signal to `finishing-a-development-branch`
+- If pass: green signal to merge the branch
 
 **Handoff protocol:**
-- Gate pass → hand off to `finishing-a-development-branch` (Superpowers)
+- Gate pass → merge the branch (optionally via the Superpowers `finishing-a-development-branch` skill)
 - Gate fail → halt, log postmortem, surface specific violation to user
 
 ---
 
 ## Notes on Spec-Kit and Superpowers Mapping
 
-| Agent Role | Spec-Kit Commands | Superpowers Skills |
+| Agent Role | Spec-Kit Commands | Optional Superpowers Skills |
 |---|---|---|
 | Planner | `/speckit-specify`, `/speckit-clarify`, `/speckit-analyze` | — |
-| Orchestrator | `/speckit-tasks` (triggers handoff) | Session startup routing |
-| Coder | — | `subagent-driven-development`, `test-driven-development` |
-| Reviewer | — | `requesting-code-review` |
-| Verifier | — | `verification-before-completion`, `finishing-a-development-branch` |
+| Orchestrator | `/speckit-tasks`, then `/speckit-implement` (the handoff) | — |
+| Coder | `/speckit-implement` | `test-driven-development`, `using-git-worktrees` |
+| Reviewer | `/speckit-converge` | `requesting-code-review` |
+| Verifier | — (runs the gates in `VERIFICATION_AND_EVAL_GUIDE.md`) | `verification-before-completion`, `finishing-a-development-branch` |
+
+Spec-Kit is the only executor. Superpowers skills are optional and only add
+discipline inside a step; they never plan or execute a feature on their own.

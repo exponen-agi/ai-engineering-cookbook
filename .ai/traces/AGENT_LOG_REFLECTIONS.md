@@ -269,3 +269,35 @@ Copy this template for each new entry. Do not modify the structure.
 (4) **Register the version-bearing facts in `templates/coherence.config.json`.** This is the **seventh** consecutive entry asking. The Spec-Kit step list now exists in `docs/installation.md` (canonical), `QUICKSTART.md`, `GLOSSARY.md` and `design/src/cookbook-data.jsx`; the GenAI attribute registry exists in `scripts/check-semconv.js` (enforcing) and `docs/agent-tracing.md` (describing). Declaring each pair would make a drifted copy fail the gate. Not done here because choosing the owner of a contested fact is a §6 decision, and because `#25` changes `check-doc-coherence.js` to add `--strict` — this should land after it.
 
 (5) **`docs/extensions.md` still lists 20 third-party tools with no URLs.** Flagged independently by `#24` and `#25`, and now a third time. It contradicts `CONTRIBUTING.md`'s own "name and link to the extension" rule and makes staleness unverifiable. Untouched here only because it is a §6-adjacent content decision about which extensions still belong on the list at all.
+
+## [2026-10-07] Session: speckit-executor-hidden-chars-extensions
+
+**Context files loaded**: `CLAUDE.md`, `.ai/config/AGENT_PROFILE_ROLES.md`, `.ai/traces/AGENT_LOG_REFLECTIONS.md`, `templates/coherence.config.json`, `.github/workflows/docs-ci.yml`. No `.specify/memory/constitution.md` and no `.specify/specs/` exist in this repo.
+**Task**: Act on the maintainer's answers to PR #26's "Deliberately not done" list: (1) make Spec-Kit the executor, (2) extend the invisible-character scan beyond `skills/`, (3) ask about registering facts in `templates/coherence.config.json`, (4) give `docs/extensions.md` real URLs, (5) fix broken characters in `docs/extensions.md` and anywhere else.
+**Outcome**: COMPLETE (items 1, 2, 4, 5). Item 3 answered and deferred to its own PR by the maintainer.
+**Changes made**: `scripts/check-hidden-chars.js` (new), `test/check-hidden-chars.test.js` (new), `scripts/check-skills.js` (literal BOM in a regex replaced by `U+FEFF escape`), `package.json`, `.github/workflows/docs-ci.yml`, `docs/extensions.md`, `docs/greenfield.md`, `docs/brownfield.md`, `docs/installation.md`, `docs/troubleshooting.md`, `docs/governance.md`, `docs/skill-review.md`, `README.md`, `QUICKSTART.md`, `GLOSSARY.md`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `.ai/config/AGENT_PROFILE_ROLES.md`, `index.html`, `design/src/cookbook-data.jsx`, `design/src/cookbook-sections.jsx`, `design/src/cookbook-app.jsx`, `design/cookbook-explorer.html` (rebuilt).
+
+**Maintainer decisions recorded** (asked this session, per §6):
+
+- **Executor:** Spec-Kit. `/speckit-implement` runs the tasks and `/speckit-converge` checks them, looping until *Converged*. Superpowers stays as an **optional TDD discipline layer** inside `/speckit-implement`, never a second executor. `CLAUDE.md` §2–§4 updated to match.
+- **Facts to register in `templates/coherence.config.json`:** the Spec-Kit step list (owner `docs/installation.md#the-full-list-of-steps`) and the pinned tool versions (owner `.github/workflows/docs-ci.yml`). To land in a **separate follow-up PR**.
+
+**Frictions encountered**:
+
+(1) **"Broken characters" had no broken bytes.** A full code-point scan found no U+FFFD, no mojibake, no stray invisible characters in `docs/extensions.md`. What renders wrong is `➔` (U+2794, a Dingbats arrow many monospace fonts lack — it showed inside code spans) and a Mermaid diagram whose subgraph names contained spaces and were then used as edge endpoints, which Mermaid cannot parse. Both fixed; `➔` replaced with `→` in `QUICKSTART.md` and `docs/governance.md` too. If the maintainer saw something else, the byte scan rules out an encoding problem.
+
+(2) **Several extension descriptions did not match their catalog pages, five of them materially.** Examples: *Project Health Check* was described as running the test suite (it checks Spec-Kit project structure); *Reconcile* as resolving merge conflicts (it updates the spec to match shipped code); *MemoryLint* as linting the constitution only (it audits every agent instruction file); *Version Guard* as multi-language (npm only). All rewritten from the pages themselves, and three placements moved to match.
+
+(3) **The brownfield guide invoked extensions by names they do not have** (`/brownfield-bootstrap`, `/brownkit`, `/ripple`). Replaced with the catalog's real command names (`speckit.brownfield.scan`, `speckit.brownkit.init`, `speckit.ripple.scan`), stated in catalog form with a pointer to the per-agent prefix table — how extension commands map to the hyphenated skills form was not verified this session.
+
+(4) **The catalog host cannot be reached from this sandbox.** `speckit-community.github.io` returns 403 at the proxy, so `markdown-link-check` fails locally on all 21 new links. Every page was fetched (HTTP 200) through a scraping service; CI's link-check job is the real verification.
+
+(5) **The new gate caught this session's own journal entry.** Writing a `\` + `uFEFF` escape through the agent's tooling produced a literal byte-order mark in the middle of this file, and the test file for the gate briefly contained literal zero-width characters the same way. `npm run lint:hidden` failed on both before anything was committed — the exact class of invisible edit the gate exists for.
+
+**Prompt clarity issues**: "Extending the invisible-character scan beyond skills" did not say how far. Chosen: every text file in the repository, reusing `check-skills`' exact rules so the two gates cannot disagree, plus one new rule for the bug that motivated it (emoji joiners inside Markdown link targets).
+
+**Suggested refinements**:
+
+(1) **Register the two facts the maintainer chose** in `templates/coherence.config.json`, in its own PR: `speckit-step-list` → `docs/installation.md#the-full-list-of-steps`, and `ci-tool-pins` → `.github/workflows/docs-ci.yml`. Copies in `QUICKSTART.md`, `GLOSSARY.md`, `design/src/cookbook-data.jsx` and `docs/toolchain.md` become links.
+
+(2) **Verify how extension commands are typed in skills mode** (`/speckit-brownfield-scan`?) and, once confirmed, add them to the per-agent prefix section of `docs/installation.md` so the brownfield guide can show a typeable command instead of the catalog name.

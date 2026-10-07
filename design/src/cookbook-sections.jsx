@@ -100,7 +100,7 @@ function Masthead({ meta }) {
             An interactive workflow explorer
           </div>
           <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
-            Spec-Kit · Superpowers · AI-Native SDLC
+            Spec-Kit · AI-Native SDLC
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@ function Masthead({ meta }) {
             In well-structured agentic pipelines, AI agents generate <strong style={{ color: "var(--accent)" }}>~75% of the implementation code</strong>. That changes the human role from <em className="display-italic">code author</em> to <em className="display-italic">intent definer, outcomes verifier, and system governor</em>.
           </p>
           <p style={{ margin: "12px 0 0", fontSize: 15, lineHeight: 1.55, color: "var(--ink-2)" }}>
-            This cookbook is a working pipeline: <strong>Spec-Kit</strong> plans what to build, <strong>Superpowers</strong> executes how, and a governance layer keeps the loop honest.
+            This cookbook is a working pipeline: <strong>Spec-Kit</strong> plans what to build, executes it and checks it against the spec, and a governance layer keeps the loop honest.
           </p>
         </div>
       </div>
@@ -129,13 +129,13 @@ function Masthead({ meta }) {
 // ─────────────────────────────────────────────────────────────────────────
 
 function SDLCDiagram({ activePhase, onPhaseClick }) {
-  // Manual SVG-friendly layout of the spec-kit -> superpowers flow
+  // Manual SVG-friendly layout of the plan -> execute flow (both Spec-Kit)
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, border: "1px solid var(--ink)", background: "var(--bg-card)" }}>
       {/* SPEC-KIT (left) */}
       <PhaseColumn
         side="left"
-        tag="Phase A — Spec-Kit"
+        tag="Phase A — Spec-Kit planning"
         title="What to build"
         nodes={COOKBOOK.specKit.map((s, i) => ({ n: String(i + 1).padStart(2, "0"), label: s.label, cmd: s.cmd, role: s.role }))}
         active={activePhase}
@@ -143,12 +143,12 @@ function SDLCDiagram({ activePhase, onPhaseClick }) {
         accent="var(--accent)"
         prefix="A"
       />
-      {/* SUPERPOWERS (right) */}
+      {/* EXECUTION (right) */}
       <PhaseColumn
         side="right"
-        tag="Phase B — Superpowers"
+        tag="Phase B — Spec-Kit execution"
         title="How to build it"
-        nodes={COOKBOOK.superpowers.map((s) => ({ n: s.n, label: s.label, cmd: s.skill, role: "Coder" }))}
+        nodes={COOKBOOK.execution.map((s) => ({ n: s.n, label: s.label, cmd: s.skill, role: "Coder" }))}
         active={activePhase}
         onClick={onPhaseClick}
         accent="var(--green)"
@@ -225,14 +225,14 @@ function PhaseDetail({ phaseId }) {
   }
   const isA = phaseId.startsWith("A");
   const idx = parseInt(phaseId.slice(1), 10);
-  const data = isA ? COOKBOOK.specKit[idx] : COOKBOOK.superpowers[idx];
+  const data = isA ? COOKBOOK.specKit[idx] : COOKBOOK.execution[idx];
   if (!data) return null;
 
   return (
     <div style={{ padding: "32px 36px", background: "var(--bg-card)", border: "1px solid var(--ink)", borderTop: "none" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: 40 }}>
         <div>
-          <Eyebrow color={isA ? "var(--accent)" : "var(--green)"}>{isA ? "Spec-Kit phase" : "Superpowers phase"} · {data.tag || data.skill}</Eyebrow>
+          <Eyebrow color={isA ? "var(--accent)" : "var(--green)"}>{isA ? "Planning phase" : "Execution phase"} · {data.tag || data.skill}</Eyebrow>
           <h4 className="display" style={{ fontSize: 44, margin: "0 0 12px", color: "var(--ink)" }}>{data.label}</h4>
           <div className="mono" style={{ fontSize: 13, color: "var(--accent)", marginBottom: 16 }}>{data.cmd || data.skill}</div>
           <p style={{ margin: "0 0 16px", fontSize: 15, lineHeight: 1.55, color: "var(--ink-2)" }}>{data.blurb}</p>
@@ -270,7 +270,7 @@ function WorkflowSection() {
         no="01"
         kicker="The Pipeline"
         title={<>Two phases, one <em className="display-italic" style={{ color: "var(--accent)" }}>handoff</em>.</>}
-        lede="Spec-Kit owns the spec. Superpowers owns the diff. The contract between them is tasks.md."
+        lede="Planning owns the spec. /speckit-implement owns the diff. The contract between them is tasks.md."
       />
       <SDLCDiagram activePhase={active} onPhaseClick={setActive} />
       <PhaseDetail phaseId={active} />
@@ -417,7 +417,7 @@ function WalkthroughSection({ workflow, setWorkflow }) {
           </div>
 
           <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid var(--rule)" }}>
-            <div className="eyebrow" style={{ marginBottom: 10 }}>Handoff message · paste into agent</div>
+            <div className="eyebrow" style={{ marginBottom: 10 }}>Handoff · run in your agent</div>
             <pre className="mono" style={{
               margin: 0,
               padding: "20px 24px",

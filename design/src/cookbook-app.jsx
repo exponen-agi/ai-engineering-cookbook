@@ -450,7 +450,7 @@ function Colophon() {
           <div className="eyebrow" style={{ marginBottom: 12 }}>Stack</div>
           <ul className="mono" style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 12, lineHeight: 1.8, color: "var(--ink-2)" }}>
             <li>Spec-Kit — github.com/github/spec-kit</li>
-            <li>Superpowers — github.com/obra/superpowers</li>
+            <li>Superpowers (optional) — github.com/obra/superpowers</li>
             <li>Claude · Cursor · Copilot · Codex</li>
             <li>Antigravity · Roo · + any agent</li>
           </ul>

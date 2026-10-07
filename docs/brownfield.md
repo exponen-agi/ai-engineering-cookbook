@@ -11,7 +11,6 @@ sequenceDiagram
     autonumber
     actor Developer
     participant Agent as Coding Agent
-    participant Superpowers as Superpowers Plugin
 
     Developer->>Agent: Run CI / Test suite (Ensure green baseline)
     Developer->>Agent: Run Brownfield Bootstrap & Risk Assessment
@@ -20,11 +19,14 @@ sequenceDiagram
     Developer->>Agent: /speckit-clarify (Check backward compatibility — optional gate)
     Developer->>Agent: /speckit-plan (Design without adding new deps)
     Developer->>Agent: /speckit-tasks (Generate tasks.md)
-    Developer->>Agent: Paste Brownfield Handoff Message
-    Agent->>Superpowers: Verify tests run green before edit
-    Agent->>Superpowers: TDD Loop (RED -> GREEN -> REFACTOR)
-    Superpowers->>Developer: Task complete, run regression suite
+    Developer->>Agent: /speckit-implement (Verify green baseline, then TDD per task)
+    Agent->>Developer: Tasks complete, run regression suite
+    Developer->>Agent: /speckit-converge (Did the code actually meet the spec?)
 ```
+
+Spec-Kit runs the whole loop. [Superpowers](https://github.com/obra/superpowers)
+is an optional TDD discipline layer on top — see
+[Greenfield: Optional Superpowers TDD discipline](./greenfield.md#optional-superpowers-tdd-discipline).
 
 ---
 
@@ -32,7 +34,7 @@ sequenceDiagram
 
 ### Step 0: Confirm the Baseline
 
-Before running any Spec-Kit or Superpowers commands, run the codebase's existing tests.
+Before running any Spec-Kit commands, run the codebase's existing tests.
 
 ```bash
 # Example test run commands
@@ -48,21 +50,18 @@ pytest
 
 ### Step 1: Bootstrapping & Setup
 
-If this is your first time adoption on the repository, run the bootstrapper to let the agent auto-discover the architecture:
+If this is your first time adopting Spec-Kit on the repository, install the
+[Brownfield Bootstrap](https://speckit-community.github.io/extensions/brownfield)
+extension and run its scan, then its bootstrap step (`speckit.brownfield.scan`,
+then `speckit.brownfield.bootstrap` — type them with your agent's
+[prefix](./installation.md#the-prefix-depends-on-your-agent)).
 
-```
-/brownfield-bootstrap
-```
+*This discovers the architecture and drafts a constitution tailored to it.*
 
-*This scans folders, locates testing frameworks, and outputs configuration details.*
+Next, run [BrownKit](https://speckit-community.github.io/extensions/brownkit)
+to assess risk, starting with `speckit.brownkit.init`.
 
-Next, run the risk assessment tool to identify fragile modules:
-
-```
-/brownkit
-```
-
-*Produces a risk profile listing protected files (e.g. database migrations, billing handlers) and potential friction points.*
+*Produces an evidence-based list of what the codebase does, with a security and QA risk assessment — including fragile areas such as database migrations and billing handlers.*
 
 ---
 
@@ -129,22 +128,32 @@ Specify that the agent must use the existing db clients and libraries, and must 
 
 ---
 
-## 🤝 The Handoff (Launching Superpowers)
+## ⚙️ Implement and Converge
 
-Paste this specific brownfield handoff message into your coding agent's chat interface. The key instruction is to **verify the baseline passes before modifying any files**.
+### Step 7: Implement the Tasks
+
+Run `/speckit-implement` with the brownfield rules as extra instructions. The key
+instruction is to **verify the baseline passes before modifying any files**.
 
 ```text
-Use the implementation plan in:
-  .specify/specs/001-user-auth/tasks.md
-
-Constraints:
-  - Do not generate a new plan
+/speckit-implement
+  Constraints:
+  - Do not generate a new plan; tasks.md is authoritative
   - Do not create a new git branch (already created by Spec-Kit as 001-user-auth)
   - Verify that all existing tests pass BEFORE touching any files
   - Follow the tech stack and protected modules in .specify/memory/constitution.md
   - Do not introduce new dependencies without explicit approval
   - All changes must be backward compatible
 ```
+
+### Step 8: Converge
+
+```text
+/speckit-converge
+```
+
+If it appends new tasks, run `/speckit-implement` again, then converge again,
+until it reports **Converged**.
 
 ---
 
@@ -198,13 +207,9 @@ Here is how the Spec-Kit files map to the existing Express app structure:
 
 ## 🛡️ Post-Implementation Safety Gate
 
-In brownfield projects, we use **Ripple** to scan for hidden coupling. After all tasks in `tasks.md` are marked green, run this step:
+In brownfield projects, we use **Ripple** to scan for hidden coupling. After all tasks in `tasks.md` are marked green, run its scan (`speckit.ripple.scan`, with your agent's prefix).
 
-```
-/ripple
-```
-
-The Ripple extension will analyze the files you changed (`User.js`, `app.js`, etc.) and find dependent modules that weren't touched but might break (e.g. user seed scripts, admin dashboard pages, billing routes). This ensures 100% confidence before merging.
+The [Ripple](https://speckit-community.github.io/extensions/ripple) extension will analyze the files you changed (`User.js`, `app.js`, etc.) and find dependent modules that weren't touched but might break (e.g. user seed scripts, admin dashboard pages, billing routes). This ensures 100% confidence before merging.
 
 ---
 

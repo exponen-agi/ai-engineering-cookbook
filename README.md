@@ -2,7 +2,7 @@
 
 Practical patterns, structures, and guidelines for building software autonomously with AI agents.
 
-This cookbook provides an opinionated engineering workflow that combines **[Spec-Kit](https://github.com/github/spec-kit)** for planning ("what to build") and **[Superpowers](https://github.com/obra/superpowers)** for execution ("how to build it"), augmented with curated community extensions and an AI governance layer.
+This cookbook provides an opinionated engineering workflow that uses **[Spec-Kit](https://github.com/github/spec-kit)** for the whole loop — planning ("what to build"), execution ("how to build it") and checking the result against the spec — with **[Superpowers](https://github.com/obra/superpowers)** as an optional TDD discipline layer, augmented with curated community extensions and an AI governance layer.
 
 ---
 
@@ -38,24 +38,26 @@ The AI Engineering Cookbook is accompanied by a modern, interactive web applicat
 
 ## 🗺️ Visual SDLC Workflow
 
-The diagram below shows how the workflow is split: Spec-Kit manages specification and planning, while Superpowers drives isolated test-driven implementation.
+The diagram below shows the workflow. Spec-Kit plans the work, executes it with
+`/speckit-implement`, and checks it with `/speckit-converge` — looping until the
+code matches the spec. Superpowers, if installed, adds TDD and review discipline
+inside the implement step.
 
 ```mermaid
 graph TD
-    subgraph Spec-Kit Phase: What to Build
+    subgraph PLAN["Spec-Kit: what to build"]
         A["1. Constitution (Rules)"] --> B["2. Specify (Idea)"]
-        B --> C["3. Clarify (Q&A)"]
+        B --> C["3. Clarify (Q&A, optional)"]
         C --> D["4. Plan (Architecture)"]
         D --> E["5. Tasks (Checklist)"]
     end
 
-    E -->|tasks.md Handoff| F
+    E --> F
 
-    subgraph Superpowers Phase: How to Build
-        F["6. Worktree Creation"] --> G["7. TDD Loop (RED/GREEN/REF)"]
-        G --> H["8. Spec & Code Review"]
-        H --> I["9. Final Verifications"]
-        I --> J["10. Branch Finish / Merge"]
+    subgraph BUILD["Spec-Kit: how to build it"]
+        F["6. Implement (TDD per task)"] --> G["7. Converge (code vs spec)"]
+        G -->|new tasks appended| F
+        G -->|Converged| H["8. Review & Merge"]
     end
 ```
 
@@ -263,7 +265,7 @@ To prevent the same concept being called different things across docs, these are
 | **specify-cli** | The CLI package that installs Spec-Kit (`uv tool install specify-cli`). | the `/speckit-*` skills |
 | **`.specify/`** | The directory Spec-Kit creates for specs, plans, tasks, and constitution. | specify-cli (the tool) |
 | **`/speckit-*`** | The Spec-Kit **agent skills** you type in your agent's chat (`/speckit-specify`, `/speckit-plan`, …). The prefix varies by agent — see [Installation](./docs/installation.md#the-prefix-depends-on-your-agent). | specify-cli (the tool); terminal commands |
-| **Superpowers** | The Claude Code plugin (`/plugin install superpowers@…`) providing TDD/worktree skills. | this repo's local `skills/` |
+| **Superpowers** | An optional agent plugin (`/plugin install superpowers@…` in Claude Code) whose TDD/worktree/review skills trigger inside `/speckit-implement`. Never a second executor. | this repo's local `skills/` |
 | **The Five Principles** | The *philosophy* (why) — authored in this README. | the Five Directives |
 | **The Five Directives** | The *operational rules* (how) — authored in [CLAUDE.md](./CLAUDE.md) §5. | the Five Principles |
 | **`skills/`** | Canonical source for this repo's installable skills. | `.claude/skills/` (generated install output — never hand-edited) |

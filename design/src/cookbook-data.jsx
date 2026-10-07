@@ -106,9 +106,9 @@ Proposed Files
       cmd: "/speckit-tasks",
       label: "Tasks",
       tag: "CHECKLIST",
-      output: "tasks.md  →  HANDOFF",
+      output: "tasks.md  →  /speckit-implement",
       role: "Orchestrator",
-      blurb: "Convert plan into a checkbox checklist. This file is the contract handed to Superpowers.",
+      blurb: "Convert plan into a checkbox checklist. This file is the contract /speckit-implement executes.",
       example: `- [ ] Task 1: Setup Prisma schema + migrations
 - [ ] Task 2: Implement db client helper + seed
 - [ ] Task 3: Unit tests for expense CRUD helpers
@@ -118,51 +118,40 @@ Proposed Files
 - [ ] Task 7: Integrate page with state mgmt
 - [ ] Task 8: Integration tests`,
     },
-    {
-      cmd: "/speckit-converge",
-      label: "Converge",
-      tag: "SPEC vs CODE",
-      output: "tasks.md (appended)",
-      role: "Verifier",
-      blurb: "Re-reads the built code against spec, plan and tasks, then appends whatever is still outstanding. Repeat implement \u2192 converge until it reports Converged.",
-      example: `missing      \u2192 acceptance criterion with no code behind it
-partial      \u2192 built, but not for every case the spec names
-contradicts  \u2192 code does the opposite of the spec
-unrequested  \u2192 code nobody asked for (scope creep)`,
-    },
   ],
 
-  // Superpowers phases — "How to build"
-  superpowers: [
+  // Execution phases — "How to build". Spec-Kit is the executor; Superpowers
+  // skills are an optional discipline layer inside the implement step.
+  execution: [
     {
       n: "06",
-      label: "Worktree",
-      skill: "using-git-worktrees",
-      blurb: "Spin up an isolated workspace. The handoff is sacred — never replan, never re-branch.",
+      label: "Implement",
+      skill: "/speckit-implement",
+      blurb: "Execute tasks.md in order, with the handoff constraints. The handoff is sacred — never replan, never re-branch. One executor per feature.",
     },
     {
       n: "07",
       label: "TDD Loop",
-      skill: "test-driven-development",
-      blurb: "RED → GREEN → REFACTOR for every task in tasks.md. Failing tests must fail for the right reason.",
+      skill: "RED → GREEN → REFACTOR",
+      blurb: "Runs inside /speckit-implement for every task. Failing tests must fail for the right reason. Optional: the Superpowers test-driven-development skill makes this harder to skip.",
     },
     {
       n: "08",
-      label: "Review",
-      skill: "requesting-code-review",
-      blurb: "Two-stage gate: spec compliance first, then code quality. Block on critical; fix minor inline.",
+      label: "Converge",
+      skill: "/speckit-converge",
+      blurb: "Re-reads the built code against spec, plan and tasks, then appends whatever is still outstanding. Repeat implement \u2192 converge until it reports Converged.",
     },
     {
       n: "09",
-      label: "Verify",
-      skill: "verification-before-completion",
-      blurb: "Final pre-merge checks — coverage floor, no secrets, log entries present, all tasks committed.",
+      label: "Review & Verify",
+      skill: "two-stage review + gates",
+      blurb: "Spec compliance first, then code quality; then the pre-merge gates — coverage floor, no secrets, log entries present, all tasks committed.",
     },
     {
       n: "10",
       label: "Finish",
-      skill: "finishing-a-development-branch",
-      blurb: "Merge or hand off. If a gate failed, the postmortem is the deliverable, not the diff.",
+      skill: "merge the branch",
+      blurb: "Merge or open the PR. If a gate failed, the postmortem is the deliverable, not the diff.",
     },
   ],
 
@@ -180,14 +169,13 @@ unrequested  \u2192 code nobody asked for (scope creep)`,
         "/speckit-clarify",
         "/speckit-plan",
         "/speckit-tasks",
-        "→ Handoff to Superpowers",
+        "→ Handoff: /speckit-implement",
         "TDD loop per task",
+        "/speckit-converge (repeat until Converged)",
         "Code review & verify",
         "Finish branch",
       ],
-      handoff: `Use the implementation plan in:
-  .specify/specs/001-expense-tracker/tasks.md
-
+      handoff: `/speckit-implement
 Constraints:
   - Do not generate a new plan
   - Do not create a new git branch (already created by Spec-Kit)
@@ -202,21 +190,20 @@ Constraints:
       example: "Express.js JWT Auth",
       steps: [
         "Confirm green baseline (npm test)",
-        "/brownfield-bootstrap",
-        "/brownkit",
+        "Brownfield Bootstrap extension (scan, bootstrap)",
+        "BrownKit extension (risk assessment)",
         "/speckit-constitution",
         "/speckit-specify (as delta)",
         "/speckit-clarify",
         "/speckit-plan",
         "/speckit-tasks",
-        "→ Handoff to Superpowers",
+        "→ Handoff: /speckit-implement",
         "Verify baseline before edits",
         "TDD loop per task",
-        "/ripple — coupling scan",
+        "/speckit-converge (repeat until Converged)",
+        "Ripple extension — coupling scan",
       ],
-      handoff: `Use the implementation plan in:
-  .specify/specs/001-user-auth/tasks.md
-
+      handoff: `/speckit-implement
 Constraints:
   - Do not generate a new plan
   - Do not create a new git branch (already created by Spec-Kit as 001-user-auth)
@@ -231,13 +218,13 @@ Constraints:
       blurb: "Targeted fix on an existing system. Skip the spec phase — root-cause first, TDD the regression.",
       example: "Single regression patch",
       steps: [
-        "systematic-debugging — find root cause",
+        "Find the root cause, not the symptom",
         "RED — write regression test",
         "Confirm test fails for the RIGHT reason",
         "GREEN — minimum fix",
         "REFACTOR — clean up, stay green",
-        "verification-before-completion",
-        "requesting-code-review",
+        "Run the verification gates",
+        "Code review",
         "Commit fix(scope): description",
       ],
       handoff: `// Bug fix path skips the Spec-Kit handoff.
@@ -266,8 +253,8 @@ Constraints:
       role: "Orchestrator",
       who: "Workflow routing & handoff",
       reads: ["AGENT_PROFILE_ROLES", "tasks.md", "constitution.md"],
-      writes: ["Handoff messages", "Escalations"],
-      tools: ["/speckit-tasks", "Session routing"],
+      writes: ["Handoff constraints", "Escalations"],
+      tools: ["/speckit-tasks", "/speckit-implement"],
       tone: "neutral",
     },
     {
@@ -275,7 +262,7 @@ Constraints:
       who: "TDD implementation (RED→GREEN→REFACTOR)",
       reads: ["tasks.md", "spec.md", "constitution.md"],
       writes: ["Source + tests", "Commits per task", "Reflection log entry"],
-      tools: ["subagent-driven-development", "test-driven-development"],
+      tools: ["/speckit-implement", "test-driven-development (optional)"],
       tone: "active",
     },
     {
@@ -283,7 +270,7 @@ Constraints:
       who: "Spec compliance + code quality",
       reads: ["spec.md", "Git diff", "Reflection log"],
       writes: ["APPROVED / BLOCKED", "Inline minor fixes"],
-      tools: ["requesting-code-review"],
+      tools: ["/speckit-converge", "requesting-code-review (optional)"],
       tone: "skeptical",
     },
     {
@@ -291,7 +278,7 @@ Constraints:
       who: "Automated pre-merge safety checks",
       reads: ["VERIFICATION_AND_EVAL_GUIDE", "Test suite output", "tasks.md"],
       writes: ["Gate report", "Postmortem on failure"],
-      tools: ["verification-before-completion", "finishing-a-development-branch"],
+      tools: ["VERIFICATION_AND_EVAL_GUIDE gates", "finishing-a-development-branch (optional)"],
       tone: "strict",
     },
   ],
