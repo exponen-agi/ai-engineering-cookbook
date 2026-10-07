@@ -216,9 +216,9 @@ To prevent the same concept being called different things across docs, these are
 | Term | Means | Not to be confused with |
 | :--- | :--- | :--- |
 | **Spec-Kit** | The product/methodology for spec-driven development. | — |
-| **specify-cli** | The CLI package that installs Spec-Kit (`uv tool install specify-cli`). | the `/speckit.*` commands |
+| **specify-cli** | The CLI package that installs Spec-Kit (`uv tool install specify-cli`). | the `/speckit-*` skills |
 | **`.specify/`** | The directory Spec-Kit creates for specs, plans, tasks, and constitution. | specify-cli (the tool) |
-| **`/speckit.*`** | The slash commands (`/speckit.specify`, `/speckit.plan`, …). | specify-cli (the tool) |
+| **`/speckit-*`** | The Spec-Kit **agent skills** you type in your agent's chat (`/speckit-specify`, `/speckit-plan`, …). The prefix varies by agent — see [Installation](./docs/installation.md#the-prefix-depends-on-your-agent). | specify-cli (the tool); terminal commands |
 | **Superpowers** | The Claude Code plugin (`/plugin install superpowers@…`) providing TDD/worktree skills. | this repo's local `skills/` |
 | **The Five Principles** | The *philosophy* (why) — authored in this README. | the Five Directives |
 | **The Five Directives** | The *operational rules* (how) — authored in [CLAUDE.md](./CLAUDE.md) §5. | the Five Principles |

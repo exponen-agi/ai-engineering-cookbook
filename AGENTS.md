@@ -66,7 +66,7 @@ graph LR
 
 | Role | One-Line Job | Triggered By |
 |---|---|---|
-| **Planner** | Turns a human's idea into a verified, testable spec | `/speckit.specify`, `/speckit.clarify` |
+| **Planner** | Turns a human's idea into a verified, testable spec | `/speckit-specify`, `/speckit-clarify` |
 | **Orchestrator** | Routes work between roles; enforces the Spec-Kit → Superpowers boundary | Session startup, task transitions |
 | **Coder** | Implements each task with TDD (RED → GREEN → REFACTOR) | `subagent-driven-development` skill |
 | **Reviewer** | Checks spec compliance first, code quality second | `requesting-code-review` skill |
@@ -78,7 +78,7 @@ graph LR
 
 ### 🗂️ Planner
 
-Translates human intent into `spec.md` acceptance criteria. Runs `/speckit.clarify` to flush ambiguities *before* planning. Every criterion must be mechanically verifiable.
+Translates human intent into `spec.md` acceptance criteria. Runs `/speckit-clarify` to flush ambiguities *before* planning. Every criterion must be mechanically verifiable.
 
 **Key rule:** Does not proceed to plan generation without explicit user approval on acceptance criteria.
 
@@ -120,8 +120,8 @@ Full role specifications — including inputs, outputs, and handoff protocols �
 
 | Role | Spec-Kit Commands | Superpowers Skills |
 |---|---|---|
-| Planner | `/speckit.specify`, `/speckit.clarify`, `/speckit.analyze` | — |
-| Orchestrator | `/speckit.tasks` (triggers handoff) | Session startup routing |
+| Planner | `/speckit-specify`, `/speckit-clarify`, `/speckit-analyze` | — |
+| Orchestrator | `/speckit-tasks` (triggers handoff) | Session startup routing |
 | Coder | — | `subagent-driven-development`, `test-driven-development` |
 | Reviewer | — | `requesting-code-review` |
 | Verifier | — | `verification-before-completion`, `finishing-a-development-branch` |

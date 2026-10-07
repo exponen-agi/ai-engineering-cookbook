@@ -108,7 +108,7 @@ test("fires again for a different session in the same working directory", () => 
 
 test("stays silent for a slash command, however long", () => {
   const cwd = makeCwd();
-  const prompt = `/speckit.specify ${SUBSTANTIVE}`;
+  const prompt = `/speckit-specify ${SUBSTANTIVE}`;
   assert.ok(prompt.length > MIN_LENGTH, "precondition: length alone would let this through");
 
   assertSilent(runHook({ session_id: "sess-slash", prompt, cwd }));
