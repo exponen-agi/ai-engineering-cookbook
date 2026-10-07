@@ -15,14 +15,15 @@ sequenceDiagram
     participant Superpowers as Superpowers Plugin
 
     Developer->>SpecKit: specify init
-    Developer->>Agent: /speckit.constitution (Define stack & rules)
-    Developer->>Agent: /speckit.specify (Describe idea)
-    Developer->>Agent: /speckit.clarify (Refine spec via Q&A)
-    Developer->>Agent: /speckit.plan (Design technical approach)
-    Developer->>Agent: /speckit.tasks (Generate tasks.md)
+    Developer->>Agent: /speckit-constitution (Define stack & rules)
+    Developer->>Agent: /speckit-specify (Describe idea)
+    Developer->>Agent: /speckit-clarify (Refine spec via Q&A — optional gate)
+    Developer->>Agent: /speckit-plan (Design technical approach)
+    Developer->>Agent: /speckit-tasks (Generate tasks.md)
     Developer->>Agent: Paste Greenfield Handoff Message
     Agent->>Superpowers: Execute tasks in TDD Loop (RED -> GREEN -> REFACTOR)
     Superpowers->>Developer: Task complete, ready for review
+    Developer->>Agent: /speckit-converge (Did the code actually meet the spec?)
 ```
 
 ---
@@ -34,17 +35,30 @@ sequenceDiagram
 Create a blank directory and initialize Spec-Kit:
 
 ```bash
+# macOS and Linux
 mkdir expense-tracker
 cd expense-tracker
-specify init . --integration claude
+specify init . --integration claude --script sh
 ```
+
+```powershell
+# Windows (PowerShell)
+New-Item -ItemType Directory expense-tracker
+Set-Location expense-tracker
+specify init . --integration claude --script ps
+```
+
+> [!NOTE]
+> The steps below are written as `/speckit-<step>`, which is what most agents use.
+> **Codex CLI uses `$speckit-<step>`** — see the
+> [per-agent prefix table](./installation.md#the-prefix-depends-on-your-agent).
 
 ### Step 2: Set the Project Constitution
 
 Define the tech stack, rules, and folder structure. Spec-Kit will write this to `.specify/memory/constitution.md`.
 
 ```
-/speckit.constitution Create principles for an expense tracker:
+/speckit-constitution Create principles for an expense tracker:
   - Tech stack: Next.js 14 (App Router), TypeScript, Tailwind CSS, Prisma with SQLite
   - Testing: Vitest and React Testing Library
   - Minimum test coverage: 80%
@@ -56,7 +70,7 @@ Define the tech stack, rules, and folder structure. Spec-Kit will write this to 
 Describe the user-facing feature. Do not mention technical code details yet; focus on *what* the application does.
 
 ```
-/speckit.specify Build a simple expense tracker dashboard.
+/speckit-specify Build a simple expense tracker dashboard.
 Users can add an expense with an amount, category, date, and description.
 Users can view a list of expenses sorted by date (newest first).
 Users can filter expenses by category.
@@ -65,12 +79,14 @@ Show a running total of the visible expenses.
 
 *Creates: `.specify/specs/001-expense-tracker/spec.md`*
 
-### Step 4: Run Clarification Q&A
+### Step 4: Run Clarification Q&A *(optional quality gate)*
 
 Let Spec-Kit analyze the spec and ask clarifying questions to remove assumptions.
+Skip this step for a small, unambiguous change; keep it for anything a team will
+maintain.
 
 ```
-/speckit.clarify
+/speckit-clarify
 ```
 
 *Example Interaction:*
@@ -84,7 +100,7 @@ Let Spec-Kit analyze the spec and ask clarifying questions to remove assumptions
 Now that the features and constraints are crystal clear, write the plan showing exactly which files will be created or modified.
 
 ```
-/speckit.plan
+/speckit-plan
 ```
 
 *Creates: `.specify/specs/001-expense-tracker/plan.md`*
@@ -94,7 +110,7 @@ Now that the features and constraints are crystal clear, write the plan showing 
 Convert the technical plan into a checkbox checklist.
 
 ```
-/speckit.tasks
+/speckit-tasks
 ```
 
 *Creates: `.specify/specs/001-expense-tracker/tasks.md`*

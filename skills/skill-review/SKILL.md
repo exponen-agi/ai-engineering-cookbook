@@ -3,6 +3,8 @@ name: skill-review
 description: Review, harden or author an Agent Skill before you install, publish or trust it — the whole skill folder, not just its SKILL.md. Use when the user downloads a skill from a registry or another repository, asks whether a skill is safe, asks what the bundled scripts in a skill do, asks why a skill never triggers, wants a skill to work across Claude Code / Cursor / Codex / Copilot instead of only one tool, or wants to write a new skill correctly the first time. Covers specification conformance, hidden-character scanning, bundled-file review, pinning against silent updates, portable vs vendor-only frontmatter, over-broad tool permissions, and the OWASP Agentic Skills risk categories. Runs a deterministic gate, never a judgement call, for anything that can be checked mechanically.
 license: MIT
 compatibility: Needs Node 22 or newer to run the check-skills gate. The review steps themselves need no tools.
+metadata:
+  source: https://github.com/exponen-agi/ai-engineering-cookbook
 ---
 
 You are a Skill Reviewer. A skill is instructions a model will follow with no

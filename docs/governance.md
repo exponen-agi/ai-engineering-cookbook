@@ -60,8 +60,8 @@ graph LR
 
 | Role | Primary Responsibility | Input File(s) | Output File(s) | Key Command/Skill |
 | :--- | :--- | :--- | :--- | :--- |
-| **Planner** | Spec authoring & clarification | User Request | `spec.md` | `/speckit.specify`, `/speckit.clarify` |
-| **Orchestrator** | Handoff & workflow routing | `spec.md`, `tasks.md` | Handoff message | `/speckit.tasks` |
+| **Planner** | Spec authoring & clarification | User Request | `spec.md` | `/speckit-specify`, `/speckit-clarify` |
+| **Orchestrator** | Handoff & workflow routing | `spec.md`, `tasks.md` | Handoff message | `/speckit-tasks` |
 | **Coder** | TDD Implementation (RED ➔ GREEN ➔ REFACTOR) | `tasks.md`, `spec.md` | Source code + Unit tests | `subagent-driven-development` |
 | **Reviewer** | Spec compliance & style review | `spec.md`, code diff | APPROVED / BLOCKED | `requesting-code-review` |
 | **Verifier** | Automated pre-merge safety checks | `VERIFICATION_AND_EVAL_GUIDE.md` | Check results | `verification-before-completion` |

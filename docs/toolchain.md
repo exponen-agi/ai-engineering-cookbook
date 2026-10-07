@@ -121,9 +121,10 @@ npm run check:toolchain
 | 2 | Every `npm install -g` in a workflow names an exact version (`pkg@1.2.3`, not `pkg` or `pkg@^1.2.3`) | Yes |
 | 3 | Every `uses:` names a fixed ref, and the same action is pinned to the same ref in every workflow | Yes |
 | 4 | No Markdown file tells readers an older Node version is enough than `package.json` requires | Yes |
-| 5 | The declared minimum is still supported upstream | **No** — prints a warning only |
+| 5 | No Markdown file tells readers to type the legacy `/speckit.<step>` form | Yes |
+| 6 | The declared minimum is still supported upstream | **No** — prints a warning only |
 
-Check 5 is deliberately a warning. A gate that turns red because a date passed, with no change to the code, is a time bomb: it breaks an unrelated pull request and teaches people to ignore the gate. It tells you, and a human decides when to move.
+Check 6 is deliberately a warning. A gate that turns red because a date passed, with no change to the code, is a time bomb: it breaks an unrelated pull request and teaches people to ignore the gate. It tells you, and a human decides when to move.
 
 ### 🧩 Check 3 — why Actions get their own rule
 
@@ -174,6 +175,51 @@ Two things are never scanned, so you do not need the marker there:
 
 - **Fenced code blocks.** What is inside one is a command or a sample transcript — an illustration, not a sentence telling you what to install.
 - **The append-only history** in `.ai/traces/` and `postmortems/`. Those files record what was true at the time. An old version number in them is the point.
+
+### 🧩 Check 5 — why a stale Spec-Kit prefix is a build failure
+
+Spec-Kit steps used to be slash *commands* written with a dot
+(`/speckit.specify`). <!-- speckit-legacy-ok --> Since the 0.16 line, `specify init` installs them as
+**agent skills**, and a skill is invoked with a **hyphen**
+(`/speckit-specify`). The dot form only still resolves if the project was
+deliberately initialized in command mode with
+`--integration-options="--commands"`.
+
+So a doc that tells a reader to type the dot form is handing most readers a
+string their agent does not recognise — and this is the worst shape a docs bug
+can have, because **nothing errors**. An unknown slash command simply does
+nothing, so the reader concludes the *workflow* is broken rather than the
+instruction.
+
+```text speckit-legacy-ok
+  Doc says:   /speckit.specify          Reader's agent (skills mode)
+                    │                            │
+                    └────────── types ───────────┤
+                                                 │
+                                        no such skill → silence
+                                                 │
+                              "this cookbook doesn't work" ◀── wrong conclusion
+```
+
+Unlike check 4, this one **does** scan inside fenced code blocks — a fenced
+command is exactly what a reader copies, so a wrong prefix in one is the whole
+problem. If a line genuinely has to quote the old form, mark it:
+
+```markdown speckit-legacy-ok
+The old form was `/speckit.specify`. <!-- speckit-legacy-ok -->
+```
+
+To exempt a whole diagram or example block, put the marker on the fence itself —
+it is invisible to readers, unlike an HTML comment inside the block:
+
+````markdown speckit-legacy-ok
+```text speckit-legacy-ok
+/speckit.specify   ← quoted on purpose
+```
+````
+
+The per-agent prefix table lives in
+[Installation → How to invoke Spec-Kit in your agent](./installation.md#-how-to-invoke-spec-kit-in-your-agent).
 
 ---
 

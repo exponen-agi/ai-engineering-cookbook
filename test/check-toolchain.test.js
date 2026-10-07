@@ -29,6 +29,8 @@ const {
   parseWorkflowNodeVersions,
   parseGlobalInstalls,
   parseNodeClaims,
+  parseLegacySpecKitRefs,
+  SPECKIT_STEPS,
   normalizeClaimLine,
   parseActionUses,
   checkActionPins,
@@ -255,6 +257,128 @@ test("parseNodeClaims handles a longer fence wrapping a shorter one", () => {
 test("parseNodeClaims honours the toolchain-ignore escape hatch", () => {
   const md = "Node 18+ was the baseline until 2026. <!-- toolchain-ignore -->\n";
   assert.deepEqual(parseNodeClaims(md), []);
+});
+
+// --- legacy Spec-Kit command form ---------------------------------------
+
+test("parseLegacySpecKitRefs finds the dot form and leaves the hyphen form alone", () => {
+  const md = [
+    "Run /speckit.specify to start.", // 1 — stale
+    "Then /speckit-plan is current.", // 2 — fine
+    "And `/speckit.tasks` in ticks.", // 3 — stale
+  ].join("\n");
+
+  assert.deepEqual(
+    parseLegacySpecKitRefs(md).map((h) => [h.line, h.step]),
+    [
+      [1, "specify"],
+      [3, "tasks"],
+    ],
+  );
+});
+
+test("parseLegacySpecKitRefs scans inside fenced code blocks", () => {
+  // The opposite of parseNodeClaims, and deliberately so: a fenced block is
+  // what a reader copies, so a wrong prefix inside one is the whole problem.
+  const md = ["```bash", "/speckit.plan", "```"].join("\n");
+
+  assert.deepEqual(
+    parseLegacySpecKitRefs(md).map((h) => h.step),
+    ["plan"],
+  );
+});
+
+test("parseLegacySpecKitRefs honours the speckit-legacy-ok escape hatch", () => {
+  const md = "The old form was `/speckit.specify`. <!-- speckit-legacy-ok -->\n";
+  assert.deepEqual(parseLegacySpecKitRefs(md), []);
+});
+
+test("parseLegacySpecKitRefs honours the marker on a fence info string", () => {
+  // An HTML comment inside a fenced block would render as visible text, so a
+  // block-level exemption has to live somewhere invisible: the info string.
+  const md = ["```text speckit-legacy-ok", "/speckit.specify", "```"].join("\n");
+  assert.deepEqual(parseLegacySpecKitRefs(md), []);
+});
+
+test("a fence exemption stops at the closing fence", () => {
+  const md = [
+    "```text speckit-legacy-ok",
+    "/speckit.plan", // 2 — exempt
+    "```",
+    "/speckit.tasks", // 4 — NOT exempt
+  ].join("\n");
+
+  assert.deepEqual(
+    parseLegacySpecKitRefs(md).map((h) => [h.line, h.step]),
+    [[4, "tasks"]],
+  );
+});
+
+test("an unmarked fence is still scanned after a marked one", () => {
+  const md = [
+    "```text speckit-legacy-ok",
+    "/speckit.plan",
+    "```",
+    "```bash",
+    "/speckit.specify", // 5 — plain fence, must be caught
+    "```",
+  ].join("\n");
+
+  assert.deepEqual(
+    parseLegacySpecKitRefs(md).map((h) => h.step),
+    ["specify"],
+  );
+});
+
+test("parseLegacySpecKitRefs ignores a dot that is not a Spec-Kit step", () => {
+  // "speckit.io" or a sentence ending in "speckit." must not be reported, or
+  // the gate becomes noise and gets switched off.
+  const md = "See speckit.io, and nothing about speckit.frobnicate here.\n";
+  assert.deepEqual(parseLegacySpecKitRefs(md), []);
+});
+
+test("parseLegacySpecKitRefs reports every occurrence on one line", () => {
+  const md = "Run /speckit.specify then /speckit.plan.\n";
+  assert.deepEqual(
+    parseLegacySpecKitRefs(md).map((h) => h.step),
+    ["specify", "plan"],
+  );
+});
+
+test("SPECKIT_STEPS covers the steps this repo's docs name", () => {
+  // If upstream adds a step and the docs adopt it, the dot form of that step
+  // would otherwise slip through unnoticed. This is the tripwire.
+  for (const step of ["constitution", "specify", "plan", "tasks", "implement", "converge"]) {
+    assert.ok(SPECKIT_STEPS.has(step), `missing Spec-Kit step: ${step}`);
+  }
+});
+
+test("the gate fails a doc that tells readers to type the legacy form", () => {
+  const result = checkToolchain({
+    root: healthyRepo({ "docs/guide.md": "Run `/speckit.specify` first.\n" }),
+    now: new Date("2026-09-02"),
+  });
+
+  assert.equal(result.ok, false);
+  const err = oneErrorMatching(result, "docs/guide.md");
+  assert.match(err, /legacy Spec-Kit command form/);
+  assert.match(err, /\/speckit-specify/); // names the fix, not just the fault
+  assert.equal(result.stats.legacySpecKit, 1);
+});
+
+test("append-only history may keep the legacy Spec-Kit form", () => {
+  // A journal entry recording "we used /speckit.specify back then" is accurate
+  // history. Same exemption the Node-claim check already makes.
+  const result = checkToolchain({
+    root: healthyRepo({
+      ".ai/traces/AGENT_LOG_REFLECTIONS.md": "We ran /speckit.specify then.\n",
+      "postmortems/POSTMORTEM_AND_LEARNING_LOG.md": "Caused by /speckit.plan.\n",
+    }),
+    now: new Date("2026-09-02"),
+  });
+
+  assert.equal(result.ok, true, result.errors.join("\n"));
+  assert.equal(result.stats.legacySpecKit, 0);
 });
 
 // --- the gate end to end ------------------------------------------------
