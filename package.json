@@ -1,18 +1,20 @@
 {
   "name": "ai-engineering-cookbook",
   "version": "0.1.1",
-  "description": "AI Engineering Cookbook — installable skills and hooks for Claude Code.",
+  "description": "AI Engineering Cookbook \u2014 installable skills and hooks for Claude Code.",
   "private": false,
   "bin": {
     "ai-engineering-cookbook": "./bin/cli.js",
     "install-prompt-optimizer": "./bin/install-prompt-optimizer.js",
     "install-doc-coherence": "./bin/install-doc-coherence.js",
-    "install-skill-review": "./bin/install-skill-review.js"
+    "install-skill-review": "./bin/install-skill-review.js",
+    "install-agent-tracing": "./bin/install-agent-tracing.js"
   },
   "scripts": {
     "test": "node --test",
     "lint:docs": "node scripts/check-doc-coherence.js",
     "lint:skills": "node scripts/check-skills.js skills --strict",
+    "lint:semconv": "node scripts/check-semconv.js templates/tracing --strict",
     "check:toolchain": "node scripts/check-toolchain.js",
     "build:explorer": "node scripts/build-explorer.js",
     "check:explorer": "node scripts/build-explorer.js --check"
