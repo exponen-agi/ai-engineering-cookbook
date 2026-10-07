@@ -173,9 +173,8 @@ You don't need to do anything during this process. Monitor the output and step i
 
 | Skill | Activates When... | Responsibility |
 | :--- | :--- | :--- |
-| `using-git-worktrees` | Handoff message is received | Creates isolated development environments |
-| `subagent-driven-development` | Checklist is ready | Dispatches a focused subagent per task |
-| `test-driven-development` | Implementation starts | Enforces RED ➔ GREEN ➔ REFACTOR cycles |
+| `using-git-worktrees` | Implementation starts on a feature | Creates an isolated development environment |
+| `test-driven-development` | Each task starts | Enforces RED → GREEN → REFACTOR cycles |
 | `requesting-code-review` | Task/Feature completes | Quality gate for spec and code reviews |
 
 ---
