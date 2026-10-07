@@ -1,5 +1,7 @@
 # Agent Tracing — seeing what your agent actually did
 
+<!-- cspell:ignore systm -- a deliberate misspelling, shown below as the example of a typo that fails silently. Deliberately NOT added to .github/cspell.json: allowing it everywhere would let a real typo through. -->
+
 Normal code is easy to debug because you can run it again and get the same
 answer. **An agent is not like that.** Give it the same question twice and you
 can get two different runs: a different tool called, a different file read, a

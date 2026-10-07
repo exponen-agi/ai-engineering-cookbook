@@ -144,7 +144,10 @@
     "recognise",
     "Phoenix",
     "OTLP",
-    "tokens"
+    "tokens",
+    "Kimi",
+    "taskstoissues",
+    "ZCode"
   ],
   "ignorePaths": [
     "node_modules",

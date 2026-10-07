@@ -182,7 +182,7 @@ Spec-Kit steps used to be slash *commands* written with a dot
 (`/speckit.specify`). <!-- speckit-legacy-ok --> Since the 0.16 line, `specify init` installs them as
 **agent skills**, and a skill is invoked with a **hyphen**
 (`/speckit-specify`). The dot form only still resolves if the project was
-deliberately initialised in command mode with
+deliberately initialized in command mode with
 `--integration-options="--commands"`.
 
 So a doc that tells a reader to type the dot form is handing most readers a

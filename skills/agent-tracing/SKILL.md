@@ -19,6 +19,9 @@ So the run itself has to be recorded while it happens. That recording is a
 
 ---
 
+<!-- cspell:ignore systm -- a deliberate misspelling, used below as the example
+     of a typo that fails silently. Not added to the shared dictionary on purpose. -->
+
 ## The one mistake this skill exists to prevent
 
 A wrong attribute name does not fail. Nothing errors.
