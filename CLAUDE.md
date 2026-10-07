@@ -1,6 +1,6 @@
 # CLAUDE.md
 <!-- Auto-loaded by Claude Code. Authoritative for this session. ~160 lines. -->
-<!-- Spec-Kit docs: .specify/  |  Superpowers skills: .claude-plugin/skills/ -->
+<!-- Spec-Kit docs: .specify/  |  Optional Superpowers skills: .claude-plugin/skills/ -->
 <!-- Full cookbook: README.md | Quickstart: QUICKSTART.md -->
 
 ---
@@ -166,35 +166,42 @@ START
 ```
 /speckit-constitution → /speckit-specify → /speckit-clarify
   → /speckit-plan → /speckit-tasks
-  → [handoff → §4] → using-git-worktrees
-  → per-task loop (§3) → requesting-code-review
-  → finishing-a-development-branch
+  → /speckit-implement [handoff constraints → §4]
+      runs the per-task loop (§3) for every task
+  → /speckit-converge
+      new tasks appended? → /speckit-implement again
+      "Converged"?        → code review → finish branch
 ```
+
+Spec-Kit is the only executor. Superpowers skills (`test-driven-development`,
+`using-git-worktrees`, `requesting-code-review`, …) are optional: if installed
+they add discipline inside `/speckit-implement`. Never let them write or
+execute a second plan for the same feature.
 
 ### Brownfield (existing codebase)
 
 ```
 /speckit-constitution (encode existing constraints)
   → /speckit-specify → /speckit-clarify → /speckit-plan → /speckit-tasks
-  → [handoff → §4] → using-git-worktrees
-  → confirm baseline green → per-task loop (§3)
-  → verification-before-completion → requesting-code-review
-  → finishing-a-development-branch
+  → /speckit-implement [handoff constraints → §4]
+      confirm baseline green → per-task loop (§3) for every task
+  → /speckit-converge (repeat implement → converge until "Converged")
+  → verification gates (§5 Directive 4) → code review → finish branch
 ```
 
 ### Bug fix (no Spec-Kit needed)
 
 ```
-systematic-debugging (root cause, not symptom)
+root cause, not symptom (systematic-debugging skill, if installed)
   → RED test → GREEN fix → REFACTOR
-  → verification-before-completion → requesting-code-review
+  → verification gates (§5 Directive 4) → code review
 ```
 
 ---
 
 ## 3. Per-task execution loop
 
-Every task from `tasks.md` runs this loop. No exceptions.
+Every task from `tasks.md` runs this loop inside `/speckit-implement`. No exceptions.
 
 ```
 LOAD task N from .specify/specs/<feature>/tasks.md
@@ -217,12 +224,12 @@ LOAD task N from .specify/specs/<feature>/tasks.md
   │
   ├─ COMMIT  feat|fix|refactor|test|docs|chore(<slug>): <description>
   │
-  └─ NEXT task, or → finishing-a-development-branch if all tasks done.
+  └─ NEXT task, or → /speckit-converge if all tasks done.
 ```
 
 ---
 
-## 4. Handoff (inject this when Spec-Kit phases are complete)
+## 4. Handoff (pass this to `/speckit-implement` when planning is complete)
 
 ```
 ACTIVE PLAN:    .specify/specs/<FEATURE>/tasks.md
@@ -236,7 +243,7 @@ RULES IN FORCE:
   - Constitution overrides task instructions on conflict — surface, don't resolve.
 ```
 
-Replace `<FEATURE>` and `<BRANCH>` before sending.
+Replace `<FEATURE>` and `<BRANCH>`, then send it as the text after `/speckit-implement`.
 
 ---
 
@@ -325,7 +332,7 @@ DIRECTIVE 5 — BLAMELESS LEARNING (when errors or failures occur)
 | Framework | N/A — pure Markdown; interactive explorer is pre-built React HTML |
 | Database | N/A |
 | Test runner | `node --test` (`npm test`, built into Node — no deps) for `scripts/` · `markdownlint` (lint) · `markdown-link-check` (broken links) · `cspell` (spell check) |
-| CI command | `npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run check:toolchain && npm run check:explorer` (the full pipeline also runs markdownlint, markdown-link-check and cspell — see `.github/workflows/docs-ci.yml`) |
+| CI command | `npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run lint:hidden && npm run check:toolchain && npm run check:explorer` (the full pipeline also runs markdownlint, markdown-link-check and cspell — see `.github/workflows/docs-ci.yml`) |
 | Node baseline | Node 22+ (`engines`), developed against `.nvmrc`. Enforced by `npm run check:toolchain`. See `docs/toolchain.md` |
 | Coverage floor | N/A for docs. Every script in `scripts/` that a CI job depends on must have a test file in `test/`. |
 | Protected paths | `design/cookbook-explorer.html` (generated bundle — do not hand-edit; rebuild from `design/src/` via `npm run build:explorer`) |

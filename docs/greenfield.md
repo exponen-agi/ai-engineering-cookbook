@@ -12,7 +12,6 @@ sequenceDiagram
     actor Developer
     participant SpecKit as Spec-Kit CLI
     participant Agent as Coding Agent
-    participant Superpowers as Superpowers Plugin
 
     Developer->>SpecKit: specify init
     Developer->>Agent: /speckit-constitution (Define stack & rules)
@@ -20,11 +19,16 @@ sequenceDiagram
     Developer->>Agent: /speckit-clarify (Refine spec via Q&A — optional gate)
     Developer->>Agent: /speckit-plan (Design technical approach)
     Developer->>Agent: /speckit-tasks (Generate tasks.md)
-    Developer->>Agent: Paste Greenfield Handoff Message
-    Agent->>Superpowers: Execute tasks in TDD Loop (RED -> GREEN -> REFACTOR)
-    Superpowers->>Developer: Task complete, ready for review
+    Developer->>Agent: /speckit-implement (Execute tasks with TDD)
+    Agent->>Developer: Tasks complete, ready for review
     Developer->>Agent: /speckit-converge (Did the code actually meet the spec?)
+    Agent->>Developer: "Converged", or new tasks appended — implement again
 ```
+
+Spec-Kit runs the whole loop: it plans, executes and checks its own work. The
+[Superpowers](https://github.com/obra/superpowers) plugin is an **optional**
+discipline layer on top — see
+[Optional: Superpowers TDD discipline](#optional-superpowers-tdd-discipline).
 
 ---
 
@@ -117,21 +121,60 @@ Convert the technical plan into a checkbox checklist.
 
 ---
 
-## 🤝 The Handoff (Launching Superpowers)
+## ⚙️ Implement and Converge
 
-Once `tasks.md` is generated, paste the following handoff message into your coding agent's chat interface. This tells Superpowers to begin coding without regenerating the plan.
+### Step 7: Implement the Tasks
+
+`/speckit-implement` works through `tasks.md` in order and ticks each task off
+as it goes. Anything you type after the command is passed to the agent as extra
+instructions — use it to state the rules that matter most:
 
 ```text
-Use the implementation plan in:
-  .specify/specs/001-expense-tracker/tasks.md
-
-Constraints:
-  - Do not generate a new plan
+/speckit-implement
+  Constraints:
+  - Do not generate a new plan; tasks.md is authoritative
   - Do not create a new git branch (already created by Spec-Kit)
   - Follow the tech stack defined in .specify/memory/constitution.md
-  - Write tests before implementation code (TDD)
+  - Write tests before implementation code (TDD: RED → GREEN → REFACTOR)
   - All tasks must pass the two-stage review (spec compliance first, code quality second)
 ```
+
+> [!TIP]
+> Put the TDD and review rules in your constitution as well. Then every
+> `/speckit-implement` run follows them, even when someone forgets the
+> constraints above.
+
+### Step 8: Converge
+
+```text
+/speckit-converge
+```
+
+`/speckit-converge` compares the code back against `spec.md`, `plan.md` and
+`tasks.md`. If anything is missing it **appends new tasks** to `tasks.md`; run
+`/speckit-implement` again, then `/speckit-converge` again, until it reports
+**Converged**.
+
+```text
+implement ──▶ converge ──▶ "Converged"? ── yes ──▶ review & merge
+    ▲                          │
+    └──── new tasks appended ◀─┘ no
+```
+
+### Optional: Superpowers TDD discipline
+
+[Superpowers](https://github.com/obra/superpowers) is a plugin of skills —
+`test-driven-development`, `using-git-worktrees`,
+`verification-before-completion`, `requesting-code-review`,
+`finishing-a-development-branch` — that make an agent stricter about TDD and
+review. Installed, they trigger **inside** `/speckit-implement` and make each
+task's RED → GREEN → REFACTOR loop harder to skip.
+
+> [!WARNING]
+> **One executor per feature.** Superpowers is a discipline layer here, not a
+> second executor. Do not ask it to write or execute its own plan for a feature
+> Spec-Kit is implementing — two planners on one `tasks.md` will disagree, and
+> both will be confident.
 
 ---
 
@@ -187,7 +230,7 @@ Here is what the Spec-Kit files look like for this project:
 
 ## 🔄 The TDD Execution Loop
 
-For each task in `tasks.md`, Superpowers spawns a subagent to run the TDD loop:
+For each task in `tasks.md`, `/speckit-implement` runs the TDD loop:
 
 ```mermaid
 graph TD

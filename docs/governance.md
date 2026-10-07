@@ -2,7 +2,7 @@
 
 A major challenge in AI-native engineering is that **AI amplifies bad decisions as fast as it implements good ones.** Without structure, agents make undocumented design assumptions, bypass testing, and introduce technical debt.
 
-The **AI-Native SDLC Framework** adds a governance, alignment, and observability layer on top of Spec-Kit and Superpowers. It ensures every execution session is tracked, failures lead to systematic learning rather than blame, and the development pipeline gets measurably smarter with each feature built.
+The **AI-Native SDLC Framework** adds a governance, alignment, and observability layer on top of Spec-Kit (and the optional Superpowers discipline skills). It ensures every execution session is tracked, failures lead to systematic learning rather than blame, and the development pipeline gets measurably smarter with each feature built.
 
 ---
 
@@ -61,10 +61,10 @@ graph LR
 | Role | Primary Responsibility | Input File(s) | Output File(s) | Key Command/Skill |
 | :--- | :--- | :--- | :--- | :--- |
 | **Planner** | Spec authoring & clarification | User Request | `spec.md` | `/speckit-specify`, `/speckit-clarify` |
-| **Orchestrator** | Handoff & workflow routing | `spec.md`, `tasks.md` | Handoff message | `/speckit-tasks` |
-| **Coder** | TDD Implementation (RED ➔ GREEN ➔ REFACTOR) | `tasks.md`, `spec.md` | Source code + Unit tests | `subagent-driven-development` |
-| **Reviewer** | Spec compliance & style review | `spec.md`, code diff | APPROVED / BLOCKED | `requesting-code-review` |
-| **Verifier** | Automated pre-merge safety checks | `VERIFICATION_AND_EVAL_GUIDE.md` | Check results | `verification-before-completion` |
+| **Orchestrator** | Handoff & workflow routing | `spec.md`, `tasks.md` | Handoff constraints | `/speckit-tasks` → `/speckit-implement` |
+| **Coder** | TDD Implementation (RED → GREEN → REFACTOR) | `tasks.md`, `spec.md` | Source code + Unit tests | `/speckit-implement` |
+| **Reviewer** | Spec compliance & style review | `spec.md`, code diff | APPROVED / BLOCKED | `/speckit-converge` + code review |
+| **Verifier** | Automated pre-merge safety checks | `VERIFICATION_AND_EVAL_GUIDE.md` | Check results | `VERIFICATION_AND_EVAL_GUIDE.md` gates |
 
 ---
 

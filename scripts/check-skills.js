@@ -149,7 +149,7 @@ function parseFrontmatter(text) {
   const fields = new Map();
   // A byte-order mark before the opening fence is untidy, not fatal; the
   // hidden-character scan reports it separately.
-  const lines = text.replace(/^﻿/, "").split(/\r?\n/);
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
 
   if (lines[0] !== "---") {
     return {

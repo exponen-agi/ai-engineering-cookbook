@@ -26,7 +26,7 @@ Run the full pipeline before you commit. It is the same command CI runs, and it
 works identically on macOS, Windows (PowerShell) and Linux.
 
 ```bash
-npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run check:toolchain && npm run check:explorer
+npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run lint:hidden && npm run check:toolchain && npm run check:explorer
 ```
 
 ## Rules
@@ -74,7 +74,7 @@ This cookbook uses a **five-agent pod** model. Each role has a distinct responsi
 ```mermaid
 graph LR
     P[🗂️ Planner] -->|spec.md| O[🔀 Orchestrator]
-    O -->|tasks.md + handoff| C[💻 Coder]
+    O -->|tasks.md + /speckit-implement| C[💻 Coder]
     C -->|code diff| R[🔍 Reviewer]
     R -->|approved| V[✅ Verifier]
     V -->|green signal| Prod[🚀 Merge]
@@ -83,10 +83,10 @@ graph LR
 | Role | One-Line Job | Triggered By |
 |---|---|---|
 | **Planner** | Turns a human's idea into a verified, testable spec | `/speckit-specify`, `/speckit-clarify` |
-| **Orchestrator** | Routes work between roles; enforces the Spec-Kit → Superpowers boundary | Session startup, task transitions |
-| **Coder** | Implements each task with TDD (RED → GREEN → REFACTOR) | `subagent-driven-development` skill |
-| **Reviewer** | Checks spec compliance first, code quality second | `requesting-code-review` skill |
-| **Verifier** | Runs all automated gates before merge | `verification-before-completion` skill |
+| **Orchestrator** | Routes work between roles; enforces the planning → execution boundary (one executor per feature) | Session startup, task transitions |
+| **Coder** | Implements each task with TDD (RED → GREEN → REFACTOR) | `/speckit-implement` |
+| **Reviewer** | Checks spec compliance first, code quality second | `/speckit-converge`, then code review |
+| **Verifier** | Runs all automated gates before merge | All tasks done and converged |
 
 ---
 
@@ -100,9 +100,9 @@ Translates human intent into `spec.md` acceptance criteria. Runs `/speckit-clari
 
 ### 🔀 Orchestrator
 
-Loads context at session start, routes tasks to the correct agent, and enforces the handoff boundary between Spec-Kit and Superpowers. Escalates blocked states to the user rather than guessing.
+Loads context at session start, routes tasks to the correct agent, and enforces the handoff boundary between planning and execution — Spec-Kit is the only executor. Escalates blocked states to the user rather than guessing.
 
-**Key rule:** Issues the standard handoff message (see [Greenfield Guide](./docs/greenfield.md) or [Brownfield Guide](./docs/brownfield.md)) only after `tasks.md` is confirmed ready.
+**Key rule:** Runs `/speckit-implement` with the standard handoff constraints (see [Greenfield Guide](./docs/greenfield.md) or [Brownfield Guide](./docs/brownfield.md)) only after `tasks.md` is confirmed ready.
 
 ### 💻 Coder
 
@@ -134,10 +134,14 @@ Full role specifications — including inputs, outputs, and handoff protocols �
 
 ## Command & Skill Mapping
 
-| Role | Spec-Kit Commands | Superpowers Skills |
+Spec-Kit runs every step. The Superpowers column is **optional**: those skills
+add discipline inside a step if the plugin is installed, and never plan or
+execute a feature on their own.
+
+| Role | Spec-Kit Commands | Optional Superpowers Skills |
 |---|---|---|
 | Planner | `/speckit-specify`, `/speckit-clarify`, `/speckit-analyze` | — |
-| Orchestrator | `/speckit-tasks` (triggers handoff) | Session startup routing |
-| Coder | — | `subagent-driven-development`, `test-driven-development` |
-| Reviewer | — | `requesting-code-review` |
-| Verifier | — | `verification-before-completion`, `finishing-a-development-branch` |
+| Orchestrator | `/speckit-tasks`, then `/speckit-implement` (the handoff) | — |
+| Coder | `/speckit-implement` | `test-driven-development`, `using-git-worktrees` |
+| Reviewer | `/speckit-converge` | `requesting-code-review` |
+| Verifier | — (runs the gates in `VERIFICATION_AND_EVAL_GUIDE.md`) | `verification-before-completion`, `finishing-a-development-branch` |

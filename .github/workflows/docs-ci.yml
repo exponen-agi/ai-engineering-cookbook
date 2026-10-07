@@ -105,6 +105,23 @@ jobs:
       - name: Validate every SKILL.md this repo publishes
         run: npm run lint:skills
 
+  # check-skills scans skills/ for characters a reviewer cannot see. Docs are
+  # read by agents too (CLAUDE.md and AGENTS.md tell them to load these files),
+  # so the same character rules run over the whole repository here, plus a
+  # check for emoji joiners hiding inside Markdown link targets.
+  hidden-chars:
+    name: Hidden Character Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_DEFAULT }}
+
+      - name: Scan every text file for invisible characters
+        run: npm run lint:hidden
+
   # The repo ships a tracing example people copy, and an attribute-name gate.
   # If an attribute name in the example ever goes stale against the GenAI
   # conventions, this job goes red before a reader copies it.

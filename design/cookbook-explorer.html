@@ -808,9 +808,9 @@ Proposed Files
       cmd: "/speckit-tasks",
       label: "Tasks",
       tag: "CHECKLIST",
-      output: "tasks.md  →  HANDOFF",
+      output: "tasks.md  →  /speckit-implement",
       role: "Orchestrator",
-      blurb: "Convert plan into a checkbox checklist. This file is the contract handed to Superpowers.",
+      blurb: "Convert plan into a checkbox checklist. This file is the contract /speckit-implement executes.",
       example: `- [ ] Task 1: Setup Prisma schema + migrations
 - [ ] Task 2: Implement db client helper + seed
 - [ ] Task 3: Unit tests for expense CRUD helpers
@@ -820,51 +820,40 @@ Proposed Files
 - [ ] Task 7: Integrate page with state mgmt
 - [ ] Task 8: Integration tests`,
     },
-    {
-      cmd: "/speckit-converge",
-      label: "Converge",
-      tag: "SPEC vs CODE",
-      output: "tasks.md (appended)",
-      role: "Verifier",
-      blurb: "Re-reads the built code against spec, plan and tasks, then appends whatever is still outstanding. Repeat implement \u2192 converge until it reports Converged.",
-      example: `missing      \u2192 acceptance criterion with no code behind it
-partial      \u2192 built, but not for every case the spec names
-contradicts  \u2192 code does the opposite of the spec
-unrequested  \u2192 code nobody asked for (scope creep)`,
-    },
   ],
 
-  // Superpowers phases — "How to build"
-  superpowers: [
+  // Execution phases — "How to build". Spec-Kit is the executor; Superpowers
+  // skills are an optional discipline layer inside the implement step.
+  execution: [
     {
       n: "06",
-      label: "Worktree",
-      skill: "using-git-worktrees",
-      blurb: "Spin up an isolated workspace. The handoff is sacred — never replan, never re-branch.",
+      label: "Implement",
+      skill: "/speckit-implement",
+      blurb: "Execute tasks.md in order, with the handoff constraints. The handoff is sacred — never replan, never re-branch. One executor per feature.",
     },
     {
       n: "07",
       label: "TDD Loop",
-      skill: "test-driven-development",
-      blurb: "RED → GREEN → REFACTOR for every task in tasks.md. Failing tests must fail for the right reason.",
+      skill: "RED → GREEN → REFACTOR",
+      blurb: "Runs inside /speckit-implement for every task. Failing tests must fail for the right reason. Optional: the Superpowers test-driven-development skill makes this harder to skip.",
     },
     {
       n: "08",
-      label: "Review",
-      skill: "requesting-code-review",
-      blurb: "Two-stage gate: spec compliance first, then code quality. Block on critical; fix minor inline.",
+      label: "Converge",
+      skill: "/speckit-converge",
+      blurb: "Re-reads the built code against spec, plan and tasks, then appends whatever is still outstanding. Repeat implement \u2192 converge until it reports Converged.",
     },
     {
       n: "09",
-      label: "Verify",
-      skill: "verification-before-completion",
-      blurb: "Final pre-merge checks — coverage floor, no secrets, log entries present, all tasks committed.",
+      label: "Review & Verify",
+      skill: "two-stage review + gates",
+      blurb: "Spec compliance first, then code quality; then the pre-merge gates — coverage floor, no secrets, log entries present, all tasks committed.",
     },
     {
       n: "10",
       label: "Finish",
-      skill: "finishing-a-development-branch",
-      blurb: "Merge or hand off. If a gate failed, the postmortem is the deliverable, not the diff.",
+      skill: "merge the branch",
+      blurb: "Merge or open the PR. If a gate failed, the postmortem is the deliverable, not the diff.",
     },
   ],
 
@@ -882,14 +871,13 @@ unrequested  \u2192 code nobody asked for (scope creep)`,
         "/speckit-clarify",
         "/speckit-plan",
         "/speckit-tasks",
-        "→ Handoff to Superpowers",
+        "→ Handoff: /speckit-implement",
         "TDD loop per task",
+        "/speckit-converge (repeat until Converged)",
         "Code review & verify",
         "Finish branch",
       ],
-      handoff: `Use the implementation plan in:
-  .specify/specs/001-expense-tracker/tasks.md
-
+      handoff: `/speckit-implement
 Constraints:
   - Do not generate a new plan
   - Do not create a new git branch (already created by Spec-Kit)
@@ -904,21 +892,20 @@ Constraints:
       example: "Express.js JWT Auth",
       steps: [
         "Confirm green baseline (npm test)",
-        "/brownfield-bootstrap",
-        "/brownkit",
+        "Brownfield Bootstrap extension (scan, bootstrap)",
+        "BrownKit extension (risk assessment)",
         "/speckit-constitution",
         "/speckit-specify (as delta)",
         "/speckit-clarify",
         "/speckit-plan",
         "/speckit-tasks",
-        "→ Handoff to Superpowers",
+        "→ Handoff: /speckit-implement",
         "Verify baseline before edits",
         "TDD loop per task",
-        "/ripple — coupling scan",
+        "/speckit-converge (repeat until Converged)",
+        "Ripple extension — coupling scan",
       ],
-      handoff: `Use the implementation plan in:
-  .specify/specs/001-user-auth/tasks.md
-
+      handoff: `/speckit-implement
 Constraints:
   - Do not generate a new plan
   - Do not create a new git branch (already created by Spec-Kit as 001-user-auth)
@@ -933,13 +920,13 @@ Constraints:
       blurb: "Targeted fix on an existing system. Skip the spec phase — root-cause first, TDD the regression.",
       example: "Single regression patch",
       steps: [
-        "systematic-debugging — find root cause",
+        "Find the root cause, not the symptom",
         "RED — write regression test",
         "Confirm test fails for the RIGHT reason",
         "GREEN — minimum fix",
         "REFACTOR — clean up, stay green",
-        "verification-before-completion",
-        "requesting-code-review",
+        "Run the verification gates",
+        "Code review",
         "Commit fix(scope): description",
       ],
       handoff: `// Bug fix path skips the Spec-Kit handoff.
@@ -968,8 +955,8 @@ Constraints:
       role: "Orchestrator",
       who: "Workflow routing & handoff",
       reads: ["AGENT_PROFILE_ROLES", "tasks.md", "constitution.md"],
-      writes: ["Handoff messages", "Escalations"],
-      tools: ["/speckit-tasks", "Session routing"],
+      writes: ["Handoff constraints", "Escalations"],
+      tools: ["/speckit-tasks", "/speckit-implement"],
       tone: "neutral",
     },
     {
@@ -977,7 +964,7 @@ Constraints:
       who: "TDD implementation (RED→GREEN→REFACTOR)",
       reads: ["tasks.md", "spec.md", "constitution.md"],
       writes: ["Source + tests", "Commits per task", "Reflection log entry"],
-      tools: ["subagent-driven-development", "test-driven-development"],
+      tools: ["/speckit-implement", "test-driven-development (optional)"],
       tone: "active",
     },
     {
@@ -985,7 +972,7 @@ Constraints:
       who: "Spec compliance + code quality",
       reads: ["spec.md", "Git diff", "Reflection log"],
       writes: ["APPROVED / BLOCKED", "Inline minor fixes"],
-      tools: ["requesting-code-review"],
+      tools: ["/speckit-converge", "requesting-code-review (optional)"],
       tone: "skeptical",
     },
     {
@@ -993,7 +980,7 @@ Constraints:
       who: "Automated pre-merge safety checks",
       reads: ["VERIFICATION_AND_EVAL_GUIDE", "Test suite output", "tasks.md"],
       writes: ["Gate report", "Postmortem on failure"],
-      tools: ["verification-before-completion", "finishing-a-development-branch"],
+      tools: ["VERIFICATION_AND_EVAL_GUIDE gates", "finishing-a-development-branch (optional)"],
       tone: "strict",
     },
   ],
@@ -1270,7 +1257,7 @@ function Masthead({ meta }) {
             An interactive workflow explorer
           </div>
           <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
-            Spec-Kit · Superpowers · AI-Native SDLC
+            Spec-Kit · AI-Native SDLC
           </div>
         </div>
       </div>
@@ -1286,7 +1273,7 @@ function Masthead({ meta }) {
             In well-structured agentic pipelines, AI agents generate <strong style={{ color: "var(--accent)" }}>~75% of the implementation code</strong>. That changes the human role from <em className="display-italic">code author</em> to <em className="display-italic">intent definer, outcomes verifier, and system governor</em>.
           </p>
           <p style={{ margin: "12px 0 0", fontSize: 15, lineHeight: 1.55, color: "var(--ink-2)" }}>
-            This cookbook is a working pipeline: <strong>Spec-Kit</strong> plans what to build, <strong>Superpowers</strong> executes how, and a governance layer keeps the loop honest.
+            This cookbook is a working pipeline: <strong>Spec-Kit</strong> plans what to build, executes it and checks it against the spec, and a governance layer keeps the loop honest.
           </p>
         </div>
       </div>
@@ -1299,13 +1286,13 @@ function Masthead({ meta }) {
 // ─────────────────────────────────────────────────────────────────────────
 
 function SDLCDiagram({ activePhase, onPhaseClick }) {
-  // Manual SVG-friendly layout of the spec-kit -> superpowers flow
+  // Manual SVG-friendly layout of the plan -> execute flow (both Spec-Kit)
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, border: "1px solid var(--ink)", background: "var(--bg-card)" }}>
       {/* SPEC-KIT (left) */}
       <PhaseColumn
         side="left"
-        tag="Phase A — Spec-Kit"
+        tag="Phase A — Spec-Kit planning"
         title="What to build"
         nodes={COOKBOOK.specKit.map((s, i) => ({ n: String(i + 1).padStart(2, "0"), label: s.label, cmd: s.cmd, role: s.role }))}
         active={activePhase}
@@ -1313,12 +1300,12 @@ function SDLCDiagram({ activePhase, onPhaseClick }) {
         accent="var(--accent)"
         prefix="A"
       />
-      {/* SUPERPOWERS (right) */}
+      {/* EXECUTION (right) */}
       <PhaseColumn
         side="right"
-        tag="Phase B — Superpowers"
+        tag="Phase B — Spec-Kit execution"
         title="How to build it"
-        nodes={COOKBOOK.superpowers.map((s) => ({ n: s.n, label: s.label, cmd: s.skill, role: "Coder" }))}
+        nodes={COOKBOOK.execution.map((s) => ({ n: s.n, label: s.label, cmd: s.skill, role: "Coder" }))}
         active={activePhase}
         onClick={onPhaseClick}
         accent="var(--green)"
@@ -1395,14 +1382,14 @@ function PhaseDetail({ phaseId }) {
   }
   const isA = phaseId.startsWith("A");
   const idx = parseInt(phaseId.slice(1), 10);
-  const data = isA ? COOKBOOK.specKit[idx] : COOKBOOK.superpowers[idx];
+  const data = isA ? COOKBOOK.specKit[idx] : COOKBOOK.execution[idx];
   if (!data) return null;
 
   return (
     <div style={{ padding: "32px 36px", background: "var(--bg-card)", border: "1px solid var(--ink)", borderTop: "none" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: 40 }}>
         <div>
-          <Eyebrow color={isA ? "var(--accent)" : "var(--green)"}>{isA ? "Spec-Kit phase" : "Superpowers phase"} · {data.tag || data.skill}</Eyebrow>
+          <Eyebrow color={isA ? "var(--accent)" : "var(--green)"}>{isA ? "Planning phase" : "Execution phase"} · {data.tag || data.skill}</Eyebrow>
           <h4 className="display" style={{ fontSize: 44, margin: "0 0 12px", color: "var(--ink)" }}>{data.label}</h4>
           <div className="mono" style={{ fontSize: 13, color: "var(--accent)", marginBottom: 16 }}>{data.cmd || data.skill}</div>
           <p style={{ margin: "0 0 16px", fontSize: 15, lineHeight: 1.55, color: "var(--ink-2)" }}>{data.blurb}</p>
@@ -1440,7 +1427,7 @@ function WorkflowSection() {
         no="01"
         kicker="The Pipeline"
         title={<>Two phases, one <em className="display-italic" style={{ color: "var(--accent)" }}>handoff</em>.</>}
-        lede="Spec-Kit owns the spec. Superpowers owns the diff. The contract between them is tasks.md."
+        lede="Planning owns the spec. /speckit-implement owns the diff. The contract between them is tasks.md."
       />
       <SDLCDiagram activePhase={active} onPhaseClick={setActive} />
       <PhaseDetail phaseId={active} />
@@ -1587,7 +1574,7 @@ function WalkthroughSection({ workflow, setWorkflow }) {
           </div>
 
           <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid var(--rule)" }}>
-            <div className="eyebrow" style={{ marginBottom: 10 }}>Handoff message · paste into agent</div>
+            <div className="eyebrow" style={{ marginBottom: 10 }}>Handoff · run in your agent</div>
             <pre className="mono" style={{
               margin: 0,
               padding: "20px 24px",
@@ -2234,7 +2221,7 @@ function Colophon() {
           <div className="eyebrow" style={{ marginBottom: 12 }}>Stack</div>
           <ul className="mono" style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 12, lineHeight: 1.8, color: "var(--ink-2)" }}>
             <li>Spec-Kit — github.com/github/spec-kit</li>
-            <li>Superpowers — github.com/obra/superpowers</li>
+            <li>Superpowers (optional) — github.com/obra/superpowers</li>
             <li>Claude · Cursor · Copilot · Codex</li>
             <li>Antigravity · Roo · + any agent</li>
           </ul>
