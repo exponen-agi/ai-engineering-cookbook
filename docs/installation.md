@@ -14,6 +14,31 @@ Before installing the tools, make sure you have the following installed on your 
 
 ---
 
+## 🖥️ Which commands differ by platform
+
+Almost nothing here does, and it is worth saying so plainly rather than leaving Windows readers to guess.
+
+| Command | macOS | Linux | Windows (PowerShell) |
+| :--- | :---: | :---: | :---: |
+| Installing `uv` | \* | \* | **different — use the PowerShell line below** |
+| Reloading `PATH` after install | not needed | not needed | **different — see the note in step 1** |
+| `uv --version`, `uv tool install …` | same | same | same |
+| `specify --version`, `specify init …` | same | same | same |
+| `specify init --script …` | `sh` | `sh` | **different — use `ps`, or `py` for a mixed team** |
+| `mkdir`, `cd` | same | same | same |
+| `npx ai-engineering-cookbook …` | same | same | same |
+
+\* macOS and Linux share the same `curl` installer line.
+
+So: **type the `bash` blocks below exactly as written on all three platforms**, except the three rows marked different. Where a block genuinely differs, this guide shows both versions side by side.
+
+The `--script` row is the one that catches people out, because nothing fails loudly: you get shell helper scripts that a PowerShell session cannot run. [Pick the helper-script language for your platform](#pick-the-helper-script-language-for-your-platform) explains the choice.
+
+> [!TIP]
+> On Windows, prefer **PowerShell 7+** (`pwsh`) over the older Windows PowerShell 5.1, and avoid `cmd.exe` for these steps. PowerShell 7 supports `&&` between commands, which several blocks in this cookbook rely on.
+
+---
+
 ## 📦 Step-by-step Installation
 
 ### 1. Install `uv` (Fast Python Package Manager)

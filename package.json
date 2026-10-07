@@ -8,13 +8,15 @@
     "install-prompt-optimizer": "./bin/install-prompt-optimizer.js",
     "install-doc-coherence": "./bin/install-doc-coherence.js",
     "install-skill-review": "./bin/install-skill-review.js",
-    "install-agent-tracing": "./bin/install-agent-tracing.js"
+    "install-agent-tracing": "./bin/install-agent-tracing.js",
+    "install-eval-harness": "./bin/install-eval-harness.js"
   },
   "scripts": {
     "test": "node --test",
     "lint:docs": "node scripts/check-doc-coherence.js --strict",
     "lint:skills": "node scripts/check-skills.js skills --strict",
     "lint:semconv": "node scripts/check-semconv.js templates/tracing --strict",
+    "lint:evals": "node scripts/check-evals.js templates/evals --strict",
     "check:toolchain": "node scripts/check-toolchain.js",
     "build:explorer": "node scripts/build-explorer.js",
     "check:explorer": "node scripts/build-explorer.js --check"

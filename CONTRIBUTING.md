@@ -90,7 +90,7 @@ To add one: edit the relevant guide (`docs/greenfield.md` or `docs/brownfield.md
 ## Adding a New Skill
 
 This repository publishes portable [Agent Skills](https://agentskills.io/specification).
-Adding one touches **seven** files, and until now that list lived only in
+Adding one touches **eight** files, and until now that list lived only in
 people's heads. Follow it in order and CI stays green; skip a step and the test
 named in the right-hand column tells you which one.
 
@@ -105,6 +105,7 @@ Replace `my-skill` with your skill's name (lowercase, hyphens, no spaces).
 | 5 | `docs/my-skill.md` | The guide | `test/published-skills.test.js` |
 | 6 | `README.md` | The `npx` block, the Installable Skills table, and the guide directory table | `test/published-skills.test.js` |
 | 7 | `index.html` | A card in the "All the guides" section, linking to `docs/my-skill.md` | `test/landing-page.test.js` |
+| 8 | `.claude-plugin/marketplace.json` | Name the skill in the `description` — the marketplace is how Claude Code users install all of them at once | `test/plugin-manifest.test.js` |
 
 ### Rules that are easy to miss
 
@@ -127,12 +128,12 @@ Replace `my-skill` with your skill's name (lowercase, hyphens, no spaces).
 
 ```bash
 # macOS and Linux
-npm test && npm run lint:docs && npm run lint:skills && npm run check:toolchain && npm run check:explorer
+npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run check:toolchain && npm run check:explorer
 ```
 
 ```powershell
 # Windows (PowerShell) — identical
-npm test; npm run lint:docs; npm run lint:skills; npm run check:toolchain; npm run check:explorer
+npm test; npm run lint:docs; npm run lint:skills; npm run lint:semconv; npm run lint:evals; npm run check:toolchain; npm run check:explorer
 ```
 
 > [!NOTE]
@@ -158,7 +159,10 @@ Before opening a PR, confirm all items:
 
 - [ ] `npm test` passes (runs the unit tests for the scripts in `scripts/` — needs Node 22 or newer; no install step required)
 - [ ] `npm run lint:docs` passes (the doc-coherence gate)
+- [ ] `npm run lint:skills` passes (every `SKILL.md` uses only the six portable frontmatter fields — see [Skill Review](./docs/skill-review.md))
+- [ ] `npm run lint:evals` passes (the example eval dataset still passes its own gate — see [Eval Harness](./docs/eval-harness.md))
 - [ ] `npm run check:toolchain` passes (Node baseline and pinned CI tools — see [Toolchain](./docs/toolchain.md))
+- [ ] `npm run check:explorer` passes (if you touched `design/src/`, rebuild with `npm run build:explorer` and commit the bundle)
 - [ ] A new guide is linked from **both** the README table and `index.html` (a test enforces the second)
 - [ ] Spell-checked (no obvious typos)
 - [ ] All links work (internal and external)
