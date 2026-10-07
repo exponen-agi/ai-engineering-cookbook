@@ -121,7 +121,16 @@ test("the CLI picker is the shared table, not a second copy of it", () => {
 });
 
 test("every installer accepts every tool the picker can offer", () => {
-  const installers = ["install-doc-coherence.js", "install-prompt-optimizer.js", "install-skill-review.js"];
+  // Derived from disk, not listed by hand. A hardcoded list silently stops
+  // covering the newest installer, which is exactly what happened when
+  // install-agent-tracing.js arrived carrying its own copy of the table —
+  // complete with the `.codex/skills` path this module exists to correct.
+  const installers = fs
+    .readdirSync(path.join(__dirname, "..", "bin"))
+    .filter((f) => /^install-.*\.js$/.test(f))
+    .sort();
+  assert.ok(installers.length >= 4, `expected every installer to be found, got: ${installers.join(", ")}`);
+
   for (const installer of installers) {
     const source = fs.readFileSync(path.join(__dirname, "..", "bin", installer), "utf8");
     assert.match(
