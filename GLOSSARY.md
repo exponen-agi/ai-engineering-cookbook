@@ -338,7 +338,7 @@ See [Greenfield Guide](./docs/greenfield.md)
 
 ## Spec-Kit
 
-A CLI tool developed by GitHub (`specify-cli`) for AI-assisted planning. It runs a structured workflow (constitution → specify → plan → tasks → implement → converge, with `clarify`, `checklist` and `analyze` as optional quality gates) that produces a verifiable `tasks.md` before any code is written. Handles the *"what to build"* half of the workflow. The steps are **agent skills, not terminal commands** — see [Installation](./docs/installation.md#️-how-to-invoke-spec-kit-in-your-agent).
+A CLI tool developed by GitHub (`specify-cli`) for AI-assisted planning. It runs a structured workflow (constitution → specify → plan → tasks → implement → converge, with `clarify`, `checklist` and `analyze` as optional quality gates) that produces a verifiable `tasks.md` before any code is written. Handles the *"what to build"* half of the workflow. The steps are **agent skills, not terminal commands** — see [Installation](./docs/installation.md#-how-to-invoke-spec-kit-in-your-agent).
 
 See [Installation Guide](./docs/installation.md)
 

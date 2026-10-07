@@ -219,7 +219,7 @@ it is invisible to readers, unlike an HTML comment inside the block:
 ````
 
 The per-agent prefix table lives in
-[Installation → How to invoke Spec-Kit in your agent](./installation.md#️-how-to-invoke-spec-kit-in-your-agent).
+[Installation → How to invoke Spec-Kit in your agent](./installation.md#-how-to-invoke-spec-kit-in-your-agent).
 
 ---
 

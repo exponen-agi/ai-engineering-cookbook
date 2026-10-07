@@ -42,6 +42,13 @@ npm test && npm run lint:docs && npm run lint:skills && npm run check:toolchain 
   `--strict`, so a skill published here uses only the six portable frontmatter
   fields — see [`docs/skill-review.md`](./docs/skill-review.md).
 - **Branch names** follow `<type>/<kebab-slug>`, e.g. `docs/add-faq`.
+- **Check the open pull requests before you plan.** This repository is worked
+  on by unattended sessions as well as people, and nothing in the repo records
+  what an in-flight branch already proposes. Two runs have independently
+  planned the same change. List the open PRs first, and treat their file lists
+  as an exclusion list.
+- **Adding a skill?** Follow the seven-file checklist in
+  [`CONTRIBUTING.md`](./CONTRIBUTING.md#adding-a-new-skill) — not from memory.
 
 ---
 

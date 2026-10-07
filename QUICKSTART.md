@@ -158,7 +158,7 @@ You don't need to do anything during this process. Monitor the output and step i
 > These are **skills you type into your agent's chat**, not terminal commands — and
 > the prefix differs by agent (`/speckit-` in most, `$speckit-` in Codex CLI). The
 > full step list and the per-agent prefix table live in
-> [Installation → How to invoke Spec-Kit in your agent](./docs/installation.md#️-how-to-invoke-spec-kit-in-your-agent).
+> [Installation → How to invoke Spec-Kit in your agent](./docs/installation.md#-how-to-invoke-spec-kit-in-your-agent).
 
 | Skill | Purpose | Output File |
 | :--- | :--- | :--- |
