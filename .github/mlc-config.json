@@ -36,9 +36,17 @@
     },
     {
       "pattern": "^https://www.nsa.gov"
+    },
+    {
+      "comment": "github.com returns 403 to automated clients (markdown-link-check included), so a valid repository link fails this job while working fine in a browser. The existing github/spec-kit and obra/superpowers patterns exist for the same reason; this generalises them. Repository links must therefore be verified by hand when added.",
+      "pattern": "^https://github.com/"
     }
   ],
-  "aliveStatusCodes": [200, 206, 429],
+  "aliveStatusCodes": [
+    200,
+    206,
+    429
+  ],
   "timeout": "10s",
   "retryOn429": true,
   "retryCount": 2

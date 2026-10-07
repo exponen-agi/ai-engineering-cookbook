@@ -87,6 +87,61 @@ To add one: edit the relevant guide (`docs/greenfield.md` or `docs/brownfield.md
 
 ---
 
+## Adding a New Skill
+
+This repository publishes portable [Agent Skills](https://agentskills.io/specification).
+Adding one touches **eight** files, and until now that list lived only in
+people's heads. Follow it in order and CI stays green; skip a step and the test
+named in the right-hand column tells you which one.
+
+Replace `my-skill` with your skill's name (lowercase, hyphens, no spaces).
+
+| # | File | What to add | Caught by |
+| :---: | :--- | :--- | :--- |
+| 1 | `skills/my-skill/SKILL.md` | The skill. `name:` must equal the folder name, and `description:` must say **when** to use it, not only what it does | `npm run lint:skills` |
+| 2 | `bin/install-my-skill.js` | The installer. Copy the closest existing one — `bin/install-skill-review.js` is the simplest | `test/published-skills.test.js` |
+| 3 | `bin/cli.js` | Three edits: a `subcommands` pair (`'my-skill'` **and** `'install-my-skill'`), a `SKILL_MENU` row, and a line in `showHelp()` | `test/cli.test.js`, `test/published-skills.test.js` |
+| 4 | `package.json` | A `bin` entry: `"install-my-skill": "./bin/install-my-skill.js"` | `test/published-skills.test.js` |
+| 5 | `docs/my-skill.md` | The guide | `test/published-skills.test.js` |
+| 6 | `README.md` | The `npx` block, the Installable Skills table, and the guide directory table | `test/published-skills.test.js` |
+| 7 | `index.html` | A card in the "All the guides" section, linking to `docs/my-skill.md` | `test/landing-page.test.js` |
+| 8 | `.claude-plugin/marketplace.json` | Name the skill in the `description` — the marketplace is how Claude Code users install all of them at once | `test/plugin-manifest.test.js` |
+
+### Rules that are easy to miss
+
+- **Only the six portable frontmatter fields.** `name`, `description`,
+  `license`, `compatibility`, `metadata`, `allowed-tools` — nothing else. CI
+  runs `lint:skills` under `--strict`, so a Claude-Code-only field such as
+  `when_to_use` fails the build. See [Skill Review](./docs/skill-review.md).
+- **Declare provenance.** Every skill here carries
+  `metadata.source` pointing at this repository, because our own
+  `skill-review` skill tells readers to ask who published a skill.
+- **A new script needs a test.** Anything under `scripts/` that a CI job
+  depends on needs a matching file in `test/` — see CLAUDE.md §7.
+- **Give commands for every platform.** If your skill or guide includes a
+  command, give the macOS/Linux form *and* the Windows PowerShell form. The
+  install commands themselves are identical everywhere; paths are not.
+- **Keep `SKILL.md` under 500 lines.** Move long reference material into
+  `references/` inside the skill folder.
+
+### Before you open the pull request
+
+```bash
+# macOS and Linux
+npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run check:toolchain && npm run check:explorer
+```
+
+```powershell
+# Windows (PowerShell) — identical
+npm test; npm run lint:docs; npm run lint:skills; npm run lint:semconv; npm run lint:evals; npm run check:toolchain; npm run check:explorer
+```
+
+> [!NOTE]
+> `design/src/` does **not** need editing for a new skill. The explorer
+> documents the workflow, not this repository's own skill catalogue.
+
+---
+
 ## Updating the Interactive Explorer
 
 The interactive web UI lives in `design/`. The source is in `design/src/*.jsx`. The `design/cookbook-explorer.html` file is a **pre-built standalone bundle** — it must be regenerated after source changes.

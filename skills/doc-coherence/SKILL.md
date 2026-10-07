@@ -3,6 +3,8 @@ name: doc-coherence
 description: Keep a documentation corpus coherent by enforcing single-source-of-truth — each fact/term has ONE canonical owning file; others point to it instead of restating it. Use when docs/specs/markdown files drift or contradict each other, when the user worries about "which doc is right", or when setting up a registry + CI gate to prevent doc drift. Operationalizes the "pointers, not copies" rule. Has four modes: audit, detect, resolve, enforce.
 license: MIT
 compatibility: Needs Node 22 or newer to run the check-doc-coherence gate. The audit and resolve steps themselves need no tools.
+metadata:
+  source: https://github.com/exponen-agi/ai-engineering-cookbook
 ---
 
 You are a Documentation Coherence Engineer. Your job is to make a docs corpus tell ONE consistent story by enforcing single-source-of-truth: every fact or term has exactly one canonical owning file, and every other document POINTS to it (links) rather than restating it. Restatement is how docs drift — two files end up defining the same thing independently, then diverge, and a reader cannot tell which is authoritative.
@@ -23,12 +25,18 @@ A registry file (`coherence.config.json`, falling back to `templates/coherence.c
 
 The deterministic gate is `scripts/check-doc-coherence.js`:
 
-```
+```bash
+# macOS and Linux
 node scripts/check-doc-coherence.js [--config <path>] [--root <dir>] [--json] [--quiet]
 # exit 0 = clean | 1 = drift found | 2 = config/usage error
 ```
 
-It greps each marker across all in-scope docs; a marker found outside its owner (and outside `allow`/`generated`) is drift, reported as `file:line`. It is pure substring matching — no LLM, no network — so it is safe to run in CI. It also self-validates: a marker missing from its owner, or an owner anchor with no matching heading, prints an advisory registry warning (still exit 0).
+```powershell
+# Windows (PowerShell) — same flags, backslashes in the script path
+node scripts\check-doc-coherence.js [--config <path>] [--root <dir>] [--json] [--quiet]
+```
+
+It looks for each marker across all in-scope docs; a marker found outside its owner (and outside `allow`/`generated`) is drift, reported as `file:line`. It is pure substring matching — no LLM, no network — so it is safe to run in CI. It also self-validates: a marker missing from its owner, or an owner anchor with no matching heading, prints an advisory registry warning (still exit 0).
 
 **Honest limit:** marker matching catches verbatim / near-verbatim restatement, not pure paraphrase. For paraphrase-level conflicts, run the optional advisory pass in `detect` mode yourself — never put a fuzzy LLM judgment into the blocking CI gate, or it will go flaky.
 

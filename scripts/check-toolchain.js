@@ -13,6 +13,8 @@
  *   3. Does every GitHub Action carry a fixed ref, and do all workflows agree
  *      on which ref, so a half-finished bump cannot pass unnoticed?
  *   4. Do the docs promise a Node version older than the one we support?
+ *   5. Do the docs still tell readers to type the legacy `/speckit.<step>`
+ *      form, which most agents no longer resolve?
  *   5. (Advisory) Is our declared minimum still receiving upstream security
  *      fixes, or has it reached end-of-life?
  *
@@ -362,6 +364,91 @@ function parseNodeClaims(md) {
   return claims;
 }
 
+/**
+ * Spec-Kit steps this repo documents. Used to recognise a *step reference*
+ * rather than any sentence that happens to contain the word.
+ */
+const SPECKIT_STEPS = new Set([
+  "constitution",
+  "specify",
+  "clarify",
+  "plan",
+  "checklist",
+  "tasks",
+  "analyze",
+  "implement",
+  "converge",
+  "taskstoissues",
+]);
+
+/**
+ * Find references to the *legacy* dot form of a Spec-Kit step, e.g.
+ * `/speckit.specify`.
+ *
+ * Why this is a gate and not a style preference: since the Spec-Kit 0.16 line,
+ * `specify init` installs Spec-Kit as **agent skills** by default, and a skill
+ * is invoked with a hyphen (`/speckit-specify`). The dot form only resolves if
+ * the project was deliberately initialised in command mode
+ * (`--integration-options="--commands"`). So a doc that tells a reader to type
+ * `/speckit.specify` is telling most readers to type something their agent does
+ * not recognise — and the failure is silent, because an unknown slash command
+ * just does nothing.
+ *
+ * Unlike `parseNodeClaims`, this scans **inside** fenced code blocks too. A
+ * command a reader copies is exactly where the wrong prefix does its damage.
+ *
+ * Escape hatch: `speckit-legacy-ok` skips a line, so a document can explain that
+ * the dot form exists and is legacy. That is the same shape as the
+ * invisible-character problem this repo already hit twice — a document that
+ * teaches you to recognise a stale form has to be able to quote it.
+ *
+ * The marker also works on a fence's **info string**, which exempts the whole
+ * block:
+ *
+ *     ```text speckit-legacy-ok
+ *     /speckit.specify   ← quoted on purpose, inside a diagram
+ *     ```
+ *
+ * A per-line HTML comment cannot be used inside a fenced block, because it
+ * would render as visible text to the reader. The info string is invisible in
+ * every Markdown renderer, which is why the block form exists.
+ *
+ * @param {string} md Markdown body
+ * @returns {{line: number, step: string, text: string}[]}
+ */
+function parseLegacySpecKitRefs(md) {
+  const re = /speckit\.([a-z]+)/gi;
+  const hits = [];
+  let fence = null; // the exact run that opened the current block
+  let fenceExempt = false; // did that fence's info string carry the marker?
+
+  String(md)
+    .split(/\r?\n/)
+    .forEach((line, idx) => {
+      const delim = /^\s*(`{3,}|~{3,})/.exec(line);
+      if (delim) {
+        if (fence === null) {
+          fence = delim[1];
+          fenceExempt = line.includes("speckit-legacy-ok");
+          return;
+        }
+        if (delim[1][0] === fence[0] && delim[1].length >= fence.length) {
+          fence = null;
+          fenceExempt = false;
+          return;
+        }
+      }
+      if (fenceExempt) return;
+      if (line.includes("speckit-legacy-ok")) return;
+      for (const m of line.matchAll(re)) {
+        const step = m[1].toLowerCase();
+        if (!SPECKIT_STEPS.has(step)) continue;
+        hits.push({ line: idx + 1, step, text: line.trim() });
+      }
+    });
+  return hits;
+}
+
 /** Directory names that are generated, vendored, or not ours to check. */
 const SKIP_DIRS = new Set([".git", "node_modules", ".specify", ".claude", "design"]);
 
@@ -407,7 +494,7 @@ function walkMarkdown(dir, root, acc) {
 function checkToolchain({ root = process.cwd(), now = new Date() } = {}) {
   const errors = [];
   const warnings = [];
-  const stats = { workflows: 0, nodeVersions: [], globalInstalls: 0, actionUses: 0, docs: 0 };
+  const stats = { workflows: 0, nodeVersions: [], globalInstalls: 0, actionUses: 0, docs: 0, legacySpecKit: 0 };
 
   // --- 1. the baseline itself -------------------------------------------
   const pkgPath = path.join(root, "package.json");
@@ -533,6 +620,15 @@ function checkToolchain({ root = process.cwd(), now = new Date() } = {}) {
         );
       }
     }
+    for (const hit of parseLegacySpecKitRefs(body)) {
+      stats.legacySpecKit += 1;
+      errors.push(
+        `${rel}:${hit.line} uses the legacy Spec-Kit command form ` +
+          `"/speckit.${hit.step}". Skills mode is the default since 0.16, so ` +
+          `write "/speckit-${hit.step}". If the line has to quote the old form, ` +
+          `mark it with speckit-legacy-ok: "${hit.text}"`,
+      );
+    }
   }
 
   // --- 5. advisory: is the baseline still supported upstream? -----------
@@ -635,6 +731,8 @@ module.exports = {
   checkActionPins,
   normalizeClaimLine,
   parseNodeClaims,
+  parseLegacySpecKitRefs,
+  SPECKIT_STEPS,
   NODE_EOL,
   MUTABLE_ACTION_REFS,
   main,

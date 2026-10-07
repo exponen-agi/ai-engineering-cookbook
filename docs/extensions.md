@@ -62,7 +62,7 @@ Run these before starting the specification to establish architectural baselines
 | Extension | Description | Fit | Where in Workflow | Skip When |
 | :--- | :--- | :---: | :--- | :--- |
 | **MemoryLint** | Validates that `constitution.md` has no contradictions, missing fields, or stale rules before starting a new spec cycle. | Both | After modifying `constitution.md` | Greenfield day 0 (no memory exists yet) |
-| **Brownfield Bootstrap** | Auto-scans an existing codebase to detect the framework, test runner, folder structure, and key entry points, then outputs a summary for the constitution. | BF | Before `/speckit.constitution` | Codebase is small and you can write it yourself |
+| **Brownfield Bootstrap** | Auto-scans an existing codebase to detect the framework, test runner, folder structure, and key entry points, then outputs a summary for the constitution. | BF | Before `/speckit-constitution` | Codebase is small and you can write it yourself |
 | **BrownKit** | Generates a risk profile of an existing codebase — identifying protected files, high-churn modules, and security-sensitive paths the agent should avoid. | BF | After Bootstrap, before constitution | Low-risk internal tool with no security profile |
 | **Project Health Check** | Runs the full test suite, checks coverage, and reports the baseline health of the project before any new feature work begins. | Both | At the start of a brownfield feature | Brand new greenfield project |
 
@@ -70,11 +70,11 @@ Run these before starting the specification to establish architectural baselines
 
 ### 2. Spec Phase Extensions
 
-Run these after `/speckit.clarify` but before `/speckit.plan` to harden the spec.
+Run these after `/speckit-clarify` but before `/speckit-plan` to harden the spec.
 
 | Extension | Description | Fit | Where in Workflow | Skip When |
 | :--- | :--- | :---: | :--- | :--- |
-| **Memory Loader** | Automatically loads `constitution.md` into the agent's context at the start of a spec session, ensuring constraints are always respected without manual copy-paste. | Both | Before any `/speckit.*` command | Auto-loading is already configured |
+| **Memory Loader** | Automatically loads `constitution.md` into the agent's context at the start of a spec session, ensuring constraints are always respected without manual copy-paste. | Both | Before any `/speckit-*` command | Auto-loading is already configured |
 | **Red Team** | Attempts to find gaps, ambiguities, or security issues in a completed spec by simulating adversarial user behavior against the acceptance criteria. | Both | After clarify, before plan | Minor bug fixes or cosmetic refactors |
 | **Spec Critique** | Reviews the spec for clarity, completeness, and testability — flags any acceptance criterion that cannot be mechanically verified. | Both | After clarify, before plan | Time-boxed spikes where the spec is incomplete |
 
@@ -82,14 +82,14 @@ Run these after `/speckit.clarify` but before `/speckit.plan` to harden the spec
 
 ### 3. Plan Phase Extensions
 
-Run these after `/speckit.plan` but before `/speckit.tasks` to identify scope creep and security risks.
+Run these after `/speckit-plan` but before `/speckit-tasks` to identify scope creep and security risks.
 
 | Extension | Description | Fit | Where in Workflow | Skip When |
 | :--- | :--- | :---: | :--- | :--- |
-| **OWASP LLM Threat Model** | Analyzes the plan for OWASP LLM Top 10 risks (prompt injection, insecure output, training data poisoning, etc.) and adds security tasks to `tasks.md`. | Both | After `/speckit.plan` | App does not call, route, or consume LLMs |
-| **Spec Scope** | Detects scope creep in `plan.md` — flags any planned file change not justified by an acceptance criterion in `spec.md`. | Both | After `/speckit.plan`, before tasks | Rapid prototypes where scope is unbounded |
-| **Architect Impact Previewer** | Maps the planned changes to all dependent modules and services, showing the blast radius before implementation starts. | Both | After `/speckit.tasks` | Simple features with no cross-cutting concerns |
-| **Version Guard** | Checks that all packages referenced in the plan match the versions in `package.json` / `pyproject.toml` to prevent dependency drift. | Both | After `/speckit.plan` | Non-JS/TS stacks; lockfiles already verified |
+| **OWASP LLM Threat Model** | Analyzes the plan for OWASP LLM Top 10 risks (prompt injection, insecure output, training data poisoning, etc.) and adds security tasks to `tasks.md`. | Both | After `/speckit-plan` | App does not call, route, or consume LLMs |
+| **Spec Scope** | Detects scope creep in `plan.md` — flags any planned file change not justified by an acceptance criterion in `spec.md`. | Both | After `/speckit-plan`, before tasks | Rapid prototypes where scope is unbounded |
+| **Architect Impact Previewer** | Maps the planned changes to all dependent modules and services, showing the blast radius before implementation starts. | Both | After `/speckit-tasks` | Simple features with no cross-cutting concerns |
+| **Version Guard** | Checks that all packages referenced in the plan match the versions in `package.json` / `pyproject.toml` to prevent dependency drift. | Both | After `/speckit-plan` | Non-JS/TS stacks; lockfiles already verified |
 
 ---
 

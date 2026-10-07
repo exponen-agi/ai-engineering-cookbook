@@ -15,7 +15,7 @@
 
 | Role | Primary Responsibility | Activated By |
 |---|---|---|
-| Planner | Spec authorship and clarification | `/speckit.specify`, `/speckit.clarify` |
+| Planner | Spec authorship and clarification | `/speckit-specify`, `/speckit-clarify` |
 | Orchestrator | Workflow routing and handoff | Session startup, task transitions |
 | Coder | Implementation (TDD loop) | `subagent-driven-development` skill |
 | Reviewer | Spec compliance + code quality | `requesting-code-review` skill |
@@ -27,7 +27,7 @@
 
 **Responsibilities:**
 - Translate human intent into `spec.md` acceptance criteria
-- Run `/speckit.clarify` to flush ambiguities before planning begins
+- Run `/speckit-clarify` to flush ambiguities before planning begins
 - Ensure every acceptance criterion is mechanically verifiable
 
 **Reads (inputs):**
@@ -143,8 +143,8 @@
 
 | Agent Role | Spec-Kit Commands | Superpowers Skills |
 |---|---|---|
-| Planner | `/speckit.specify`, `/speckit.clarify`, `/speckit.analyze` | — |
-| Orchestrator | `/speckit.tasks` (triggers handoff) | Session startup routing |
+| Planner | `/speckit-specify`, `/speckit-clarify`, `/speckit-analyze` | — |
+| Orchestrator | `/speckit-tasks` (triggers handoff) | Session startup routing |
 | Coder | — | `subagent-driven-development`, `test-driven-development` |
 | Reviewer | — | `requesting-code-review` |
 | Verifier | — | `verification-before-completion`, `finishing-a-development-branch` |

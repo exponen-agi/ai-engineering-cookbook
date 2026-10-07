@@ -3,6 +3,8 @@ name: eval-harness
 description: Build, review or repair an eval suite (a golden dataset) that scores whether an LLM feature is actually any good, and wire it into CI as a blocking gate. Use when the user is adding a feature that calls a model, asks how to test a prompt or an agent, says their evals always pass or never catch anything, wants to turn a bad production run into a permanent test case, or is choosing between exact matching and an LLM judge. Covers dataset design, the cheapest-scorer-first ladder, judge calibration, pass-rate thresholds, and a deterministic gate that checks the suite is capable of failing.
 license: MIT
 compatibility: Needs Node 22 or newer to run the check-evals gate. Running the evals themselves needs your own eval runner and a model API key; the gate needs neither.
+metadata:
+  source: https://github.com/exponen-agi/ai-engineering-cookbook
 ---
 
 You are an Eval Engineer. Your job is to make an LLM feature's quality

@@ -10,7 +10,7 @@ Before installing the tools, make sure you have the following installed on your 
 
 - **Git**: Active version control.
 - **Node.js** (v22 or higher): Required if you are developing Node-based applications, and to run this repository's own checks. Node 18 and Node 20 have both reached end-of-life and no longer receive security fixes — see [Toolchain & Node Baseline](./toolchain.md).
-- **Python** (v3.10 or higher): Required for Spec-Kit.
+- **Python** (v3.11 or higher): Required for Spec-Kit. Checked against the Spec-Kit README on 2026-10-07.
 
 ---
 
@@ -24,12 +24,15 @@ Almost nothing here does, and it is worth saying so plainly rather than leaving 
 | Reloading `PATH` after install | not needed | not needed | **different — see the note in step 1** |
 | `uv --version`, `uv tool install …` | same | same | same |
 | `specify --version`, `specify init …` | same | same | same |
+| `specify init --script …` | `sh` | `sh` | **different — use `ps`, or `py` for a mixed team** |
 | `mkdir`, `cd` | same | same | same |
 | `npx ai-engineering-cookbook …` | same | same | same |
 
 \* macOS and Linux share the same `curl` installer line.
 
-So: **type the `bash` blocks below exactly as written on all three platforms**, except the two rows marked different. Where a block genuinely differs, this guide shows both versions side by side.
+So: **type the `bash` blocks below exactly as written on all three platforms**, except the three rows marked different. Where a block genuinely differs, this guide shows both versions side by side.
+
+The `--script` row is the one that catches people out, because nothing fails loudly: you get shell helper scripts that a PowerShell session cannot run. [Pick the helper-script language for your platform](#pick-the-helper-script-language-for-your-platform) explains the choice.
 
 > [!TIP]
 > On Windows, prefer **PowerShell 7+** (`pwsh`) over the older Windows PowerShell 5.1, and avoid `cmd.exe` for these steps. PowerShell 7 supports `&&` between commands, which several blocks in this cookbook rely on.
@@ -143,6 +146,133 @@ specify init . --force --integration claude
 
 > [!IMPORTANT]
 > The `--force` flag is safe to use. It only creates the `.specify/` directory structure and does not modify or delete any of your existing source files.
+
+---
+
+## ⌨️ How to invoke Spec-Kit in your agent
+
+> [!IMPORTANT]
+> **This is the one thing people get wrong.** Spec-Kit steps are **agent skills, not
+> terminal commands**. You type them into your agent's chat window, never into a
+> shell. And the **prefix is different in different agents** — if you copy a command
+> from a blog post and nothing happens, this is almost always why.
+
+### The prefix depends on your agent
+
+`specify init` installs the steps into a folder your agent reads, then your agent
+decides how they are invoked. Three prefixes are in use today:
+
+| Prefix | Agents that use it | Example |
+| :--- | :--- | :--- |
+| `/speckit-<step>` | GitHub Copilot, Claude Code, Zed, Factory Droid, Devin, Grok Build, and most others | `/speckit-specify` |
+| `$speckit-<step>` | OpenAI Codex CLI, ZCode, Command Code | `$speckit-specify` |
+| `/skill:speckit-<step>` | Kimi Code | `/skill:speckit-specify` |
+
+This guide writes the `/speckit-<step>` form everywhere because it is the most
+common. **Substitute your agent's prefix from the table above.**
+
+> [!NOTE]
+> **Why you may see `/speckit.specify` with a dot elsewhere.** <!-- speckit-legacy-ok --> The dot form is the
+> older *command* mode. Since the 0.16 release, `specify init` installs **skills**
+> by default, and skills use a hyphen. The dot form still works, but only if you
+> deliberately ask for command mode with
+> `specify init . --integration claude --integration-options="--commands"`.
+> If you followed this guide, you have skills, so use the hyphen.
+
+**Not sure which you got?** List the folder your agent reads — if you see
+`speckit-specify`, you are in skills mode:
+
+```bash
+# macOS and Linux
+ls .claude/skills/        # Claude Code
+ls .github/skills/        # GitHub Copilot
+ls .agents/skills/        # Codex CLI, Zed, Antigravity
+```
+
+```powershell
+# Windows (PowerShell)
+Get-ChildItem .claude\skills\
+Get-ChildItem .github\skills\
+Get-ChildItem .agents\skills\
+```
+
+### Pick the helper-script language for your platform
+
+Spec-Kit ships small helper scripts alongside the skills. `--script` chooses which
+language they are written in, and the default depends on your operating system.
+**On Windows this matters** — the shell scripts assume a POSIX shell:
+
+| Flag | Scripts you get | Use it when |
+| :--- | :--- | :--- |
+| `--script sh` | POSIX shell (`.sh`) | macOS, Linux, or Windows inside WSL or Git Bash |
+| `--script ps` | PowerShell (`.ps1`) | Windows, native PowerShell |
+| `--script py` | Python (`.py`) | Any platform — one set of scripts everywhere |
+
+```bash
+# macOS and Linux
+specify init . --integration claude --script sh
+```
+
+```powershell
+# Windows (PowerShell)
+specify init . --integration claude --script ps
+```
+
+```bash
+# Any platform — avoids the shell-vs-PowerShell difference entirely
+specify init . --integration claude --script py
+```
+
+> [!TIP]
+> If your team mixes macOS and Windows, prefer `--script py`. One set of scripts
+> behaves the same on every machine, so a step that works for one teammate works
+> for all of them.
+
+### The full list of steps
+
+Only `/speckit-specify` is strictly required before `/speckit-plan`. The three
+steps marked *optional gate* are quality checks you add when a feature has real
+ambiguity — skip them for a small, obvious change.
+
+| Step | What it does | Kind |
+| :--- | :--- | :--- |
+| `/speckit-constitution` | Set project-wide rules and tech stack | once per project |
+| `/speckit-specify` | Describe the feature; writes `spec.md` | **required** |
+| `/speckit-clarify` | Interactive Q&A to remove ambiguity | *optional gate* |
+| `/speckit-plan` | Design the technical approach; writes `plan.md` | core |
+| `/speckit-checklist` | Generate a requirements-quality checklist | *optional gate* |
+| `/speckit-tasks` | Turn the plan into a checklist; writes `tasks.md` | core |
+| `/speckit-analyze` | Check the spec, plan and tasks agree | *optional gate* |
+| `/speckit-implement` | Execute the tasks | core |
+| `/speckit-converge` | Compare the code back against spec/plan/tasks and append what is still missing | core |
+| `/speckit-taskstoissues` | Turn tasks into GitHub issues | optional |
+
+```text
+  once          ┌──────────── optional quality gates ────────────┐
+    │           │                                               │
+constitution    clarify              checklist          analyze
+    │              │                     │                 │
+    ▼              ▼                     ▼                 ▼
+  specify ──▶ (clarify) ──▶ plan ──▶ (checklist) ──▶ tasks ──▶ (analyze) ──▶ implement ──▶ converge
+                                                                                  ▲            │
+                                                                                  └── repeat ──┘
+                                                                              until "Converged"
+```
+
+> [!NOTE]
+> **Two extra workflows exist** and are installed separately, so they are not in the
+> table above: bug fixing (`specify extension add bug`) and idea assessment
+> (`specify extension add assess`). See the
+> [Spec-Kit repository](https://github.com/github/spec-kit) for what each adds.
+
+**Which executor runs the tasks?**
+
+> [!WARNING]
+> **`/speckit-implement` overlaps with this cookbook's handoff model.** This
+> cookbook hands `tasks.md` to Superpowers for the TDD execution loop — see
+> [Greenfield](./greenfield.md). Spec-Kit can now also execute tasks itself. Both
+> work; using both at once on the same feature does not. Pick one executor per
+> feature and say which in your constitution.
 
 ---
 

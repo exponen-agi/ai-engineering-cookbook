@@ -11,6 +11,8 @@ const subcommands = {
   'install-prompt-optimizer': './install-prompt-optimizer.js',
   'skill-review': './install-skill-review.js',
   'install-skill-review': './install-skill-review.js',
+  'agent-tracing': './install-agent-tracing.js',
+  'install-agent-tracing': './install-agent-tracing.js',
   'eval-harness': './install-eval-harness.js',
   'install-eval-harness': './install-eval-harness.js'
 };
@@ -44,6 +46,7 @@ function showHelp() {
       '  \x1b[1mdoc-coherence\x1b[0m     Kills cross-document drift with a single-source-of-truth gate.',
       '  \x1b[1mprompt-optimizer\x1b[0m  Optimizes agent prompts on session-start with custom scorecards.',
       '  \x1b[1mskill-review\x1b[0m      Vets a SKILL.md before you trust it — spec, portability, hidden characters.',
+      '  \x1b[1magent-tracing\x1b[0m     Traces an agent to the OpenTelemetry GenAI conventions, with a name gate.',
       '  \x1b[1meval-harness\x1b[0m      Builds an eval suite that can actually fail, and gates it in CI.',
       '',
       '\x1b[1mSupported coding-agent environments:\x1b[0m',
@@ -159,6 +162,7 @@ const SKILL_MENU = [
   { skill: 'doc-coherence', label: 'Doc Coherence', blurb: 'Single-source-of-truth registry & CI gate' },
   { skill: 'prompt-optimizer', label: 'Prompt Optimizer', blurb: 'Calibrate & optimize agent prompts' },
   { skill: 'skill-review', label: 'Skill Review', blurb: 'Vet a SKILL.md before you trust it' },
+  { skill: 'agent-tracing', label: 'Agent Tracing', blurb: 'Trace an agent to the OTel GenAI conventions' },
   { skill: 'eval-harness', label: 'Eval Harness', blurb: 'Build an eval suite that can actually fail' }
 ];
 

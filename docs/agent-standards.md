@@ -119,7 +119,7 @@ So you can install fifty skills and pay for only the fifty descriptions until on
 > [!IMPORTANT]
 > The `description` field is doing the real work. It is the only thing the agent sees when deciding whether to use your skill. Write it as *"Do X. Use when the user asks for Y or Z."* — name the trigger words a user would actually type.
 
-**This repository ships four skills** you can install into your own project — see [Installable Skills](../README.md#-installable-skills). The same `SKILL.md` file works in Claude Code, Cursor, Codex, Copilot, Roo Code and Antigravity; only the install folder differs.
+**This repository ships five skills** you can install into your own project — see [Installable Skills](../README.md#-installable-skills). The same `SKILL.md` file works in Claude Code, Cursor, Codex, Copilot, Roo Code and Antigravity; only the install folder differs.
 
 ### How skills get distributed
 

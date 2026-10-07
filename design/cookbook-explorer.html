@@ -711,7 +711,7 @@ const COOKBOOK = {
     titleItalic: "Cookbook",
     subtitle: "Practical patterns for building software autonomously with AI agents.",
     repo: "exponen-agi/ai-engineering-cookbook",
-    edition: "Edition 2026.08",
+    edition: "Edition 2026.10",
   },
 
   principles: [
@@ -750,7 +750,7 @@ const COOKBOOK = {
   // Spec-Kit phases — "What to build"
   specKit: [
     {
-      cmd: "/speckit.constitution",
+      cmd: "/speckit-constitution",
       label: "Constitution",
       tag: "RULES",
       output: ".specify/memory/constitution.md",
@@ -763,7 +763,7 @@ const COOKBOOK = {
   - Currency rule: store amounts as integers (cents), never floats.`,
     },
     {
-      cmd: "/speckit.specify",
+      cmd: "/speckit-specify",
       label: "Specify",
       tag: "IDEA",
       output: "spec.md",
@@ -775,12 +775,12 @@ Users can view expenses sorted by date (newest first).
 Users can filter by category. Show a running total.`,
     },
     {
-      cmd: "/speckit.clarify",
+      cmd: "/speckit-clarify",
       label: "Clarify",
-      tag: "Q&A",
+      tag: "Q&A · OPTIONAL GATE",
       output: "spec.md (appended)",
       role: "Planner",
-      blurb: "Interactive Q&A flushes ambiguity. Every acceptance criterion must be mechanically verifiable.",
+      blurb: "Interactive Q&A flushes ambiguity. Every acceptance criterion must be mechanically verifiable. An optional quality gate — skip it on a small, unambiguous change.",
       example: `Q: What are the pre-defined categories? Custom?
 A: Pre-defined: Food, Rent, Transport, Entertainment, Utilities, Other.
 
@@ -788,7 +788,7 @@ Q: Should the database persist locally?
 A: Yes, use a local SQLite database through Prisma.`,
     },
     {
-      cmd: "/speckit.plan",
+      cmd: "/speckit-plan",
       label: "Plan",
       tag: "ARCHITECTURE",
       output: "plan.md",
@@ -805,7 +805,7 @@ Proposed Files
   src/app/page.tsx`,
     },
     {
-      cmd: "/speckit.tasks",
+      cmd: "/speckit-tasks",
       label: "Tasks",
       tag: "CHECKLIST",
       output: "tasks.md  →  HANDOFF",
@@ -819,6 +819,18 @@ Proposed Files
 - [ ] Task 6: ExpenseList + CategoryFilter
 - [ ] Task 7: Integrate page with state mgmt
 - [ ] Task 8: Integration tests`,
+    },
+    {
+      cmd: "/speckit-converge",
+      label: "Converge",
+      tag: "SPEC vs CODE",
+      output: "tasks.md (appended)",
+      role: "Verifier",
+      blurb: "Re-reads the built code against spec, plan and tasks, then appends whatever is still outstanding. Repeat implement \u2192 converge until it reports Converged.",
+      example: `missing      \u2192 acceptance criterion with no code behind it
+partial      \u2192 built, but not for every case the spec names
+contradicts  \u2192 code does the opposite of the spec
+unrequested  \u2192 code nobody asked for (scope creep)`,
     },
   ],
 
@@ -865,11 +877,11 @@ Proposed Files
       example: "Next.js Expense Tracker",
       steps: [
         "specify init . --integration claude",
-        "/speckit.constitution",
-        "/speckit.specify",
-        "/speckit.clarify",
-        "/speckit.plan",
-        "/speckit.tasks",
+        "/speckit-constitution",
+        "/speckit-specify",
+        "/speckit-clarify",
+        "/speckit-plan",
+        "/speckit-tasks",
         "→ Handoff to Superpowers",
         "TDD loop per task",
         "Code review & verify",
@@ -894,11 +906,11 @@ Constraints:
         "Confirm green baseline (npm test)",
         "/brownfield-bootstrap",
         "/brownkit",
-        "/speckit.constitution",
-        "/speckit.specify (as delta)",
-        "/speckit.clarify",
-        "/speckit.plan",
-        "/speckit.tasks",
+        "/speckit-constitution",
+        "/speckit-specify (as delta)",
+        "/speckit-clarify",
+        "/speckit-plan",
+        "/speckit-tasks",
         "→ Handoff to Superpowers",
         "Verify baseline before edits",
         "TDD loop per task",
@@ -949,7 +961,7 @@ Constraints:
       who: "Spec authoring & clarification",
       reads: ["Human intent", "constitution.md", "VERIFICATION_AND_EVAL_GUIDE"],
       writes: ["spec.md", "Clarification Q&A"],
-      tools: ["/speckit.specify", "/speckit.clarify", "/speckit.analyze"],
+      tools: ["/speckit-specify", "/speckit-clarify", "/speckit-analyze"],
       tone: "deliberate",
     },
     {
@@ -957,7 +969,7 @@ Constraints:
       who: "Workflow routing & handoff",
       reads: ["AGENT_PROFILE_ROLES", "tasks.md", "constitution.md"],
       writes: ["Handoff messages", "Escalations"],
-      tools: ["/speckit.tasks", "Session routing"],
+      tools: ["/speckit-tasks", "Session routing"],
       tone: "neutral",
     },
     {
@@ -1038,18 +1050,18 @@ Constraints:
   // 20 curated extensions
   extensions: [
     { name: "MemoryLint", fit: "Both", phase: "Pre-Spec", note: "After modifying constitution.md", skip: "Greenfield day 0" },
-    { name: "Brownfield Bootstrap", fit: "BF", phase: "Pre-Spec", note: "Before /speckit.constitution", skip: "Codebase is small" },
+    { name: "Brownfield Bootstrap", fit: "BF", phase: "Pre-Spec", note: "Before /speckit-constitution", skip: "Codebase is small" },
     { name: "BrownKit", fit: "BF", phase: "Pre-Spec", note: "After Bootstrap, before constitution", skip: "Low-risk internal tool" },
     { name: "Project Health Check", fit: "Both", phase: "Pre-Spec", note: "Start of brownfield feature", skip: "Brand new greenfield" },
 
-    { name: "Memory Loader", fit: "Both", phase: "Spec", note: "Before any /speckit.* command", skip: "Auto-loading configured" },
+    { name: "Memory Loader", fit: "Both", phase: "Spec", note: "Before any /speckit-* command", skip: "Auto-loading configured" },
     { name: "Red Team", fit: "Both", phase: "Spec", note: "After clarify, before plan", skip: "Cosmetic refactors" },
     { name: "Spec Critique", fit: "Both", phase: "Spec", note: "After clarify, before plan", skip: "Time-boxed spikes" },
 
-    { name: "OWASP LLM Threat Model", fit: "Both", phase: "Plan", note: "After /speckit.plan", skip: "App doesn't touch LLMs" },
+    { name: "OWASP LLM Threat Model", fit: "Both", phase: "Plan", note: "After /speckit-plan", skip: "App doesn't touch LLMs" },
     { name: "Spec Scope", fit: "Both", phase: "Plan", note: "After plan, before tasks", skip: "Rapid prototypes" },
-    { name: "Architect Impact Previewer", fit: "Both", phase: "Plan", note: "After /speckit.tasks", skip: "No cross-cutting concerns" },
-    { name: "Version Guard", fit: "Both", phase: "Plan", note: "After /speckit.plan", skip: "Non-JS/TS stacks" },
+    { name: "Architect Impact Previewer", fit: "Both", phase: "Plan", note: "After /speckit-tasks", skip: "No cross-cutting concerns" },
+    { name: "Version Guard", fit: "Both", phase: "Plan", note: "After /speckit-plan", skip: "Non-JS/TS stacks" },
 
     { name: "SpecTest", fit: "Both", phase: "Impl", note: "Before the RED phase", skip: "Simple tasks" },
     { name: "Checkpoint", fit: "Both", phase: "Impl", note: "After each TDD cycle", skip: "Tiny tasks" },

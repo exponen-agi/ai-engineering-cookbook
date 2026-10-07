@@ -105,6 +105,22 @@ jobs:
       - name: Validate every SKILL.md this repo publishes
         run: npm run lint:skills
 
+  # The repo ships a tracing example people copy, and an attribute-name gate.
+  # If an attribute name in the example ever goes stale against the GenAI
+  # conventions, this job goes red before a reader copies it.
+  semconv:
+    name: GenAI Attribute Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_DEFAULT }}
+
+      - name: Validate the GenAI attribute names in the shipped example
+        run: npm run lint:semconv
+
   # The eval-harness skill tells readers to copy templates/evals/ as their
   # starting point. An example that does not pass its own gate would teach the
   # wrong shape to everyone who copies it, so the example is checked here under

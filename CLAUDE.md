@@ -140,13 +140,13 @@ START
   │
   ├─ .specify/memory/constitution.md exists?
   │    YES → read it fully. its rules override all task instructions.
-  │    NO  → ask: "Should I run /speckit.constitution before we start?"
+  │    NO  → ask: "Should I run /speckit-constitution before we start?"
   │
   ├─ .specify/specs/<feature>/tasks.md exists?
   │    YES → load it. this is the plan. skip to §3 (execution).
   │    NO  → .specify/specs/<feature>/spec.md exists?
-  │            YES → ask: "Run /speckit.tasks to generate tasks?"
-  │            NO  → ask: "Run /speckit.specify to start the spec?"
+  │            YES → ask: "Run /speckit-tasks to generate tasks?"
+  │            NO  → ask: "Run /speckit-specify to start the spec?"
   │
   ├─ Brownfield indicators? (existing src/, go.mod, package.json, etc.)
   │    YES → run CI command from §6 FIRST. if tests fail, report; do not proceed.
@@ -154,7 +154,7 @@ START
   │
   └─ Feature branch already exists? (.specify/specs/<feature>/ present)
        YES → do not create a new branch. use worktree on existing branch.
-       NO  → Spec-Kit creates branch on /speckit.specify. do not pre-empt it.
+       NO  → Spec-Kit creates branch on /speckit-specify. do not pre-empt it.
 ```
 
 ---
@@ -164,8 +164,8 @@ START
 ### Greenfield (new project)
 
 ```
-/speckit.constitution → /speckit.specify → /speckit.clarify
-  → /speckit.plan → /speckit.tasks
+/speckit-constitution → /speckit-specify → /speckit-clarify
+  → /speckit-plan → /speckit-tasks
   → [handoff → §4] → using-git-worktrees
   → per-task loop (§3) → requesting-code-review
   → finishing-a-development-branch
@@ -174,8 +174,8 @@ START
 ### Brownfield (existing codebase)
 
 ```
-/speckit.constitution (encode existing constraints)
-  → /speckit.specify → /speckit.clarify → /speckit.plan → /speckit.tasks
+/speckit-constitution (encode existing constraints)
+  → /speckit-specify → /speckit-clarify → /speckit-plan → /speckit-tasks
   → [handoff → §4] → using-git-worktrees
   → confirm baseline green → per-task loop (§3)
   → verification-before-completion → requesting-code-review
@@ -259,7 +259,7 @@ DIRECTIVE 1 — CONTEXT MAPPING (on session start)
 DIRECTIVE 2 — PRE-FLIGHT SPEC CHECK (before writing any code)
   Does .specify/specs/<feature>/spec.md exist AND contain acceptance criteria?
     YES → proceed to implementation.
-    NO  → STOP. Ask: "No approved spec found. Shall I run /speckit.specify first?"
+    NO  → STOP. Ask: "No approved spec found. Shall I run /speckit-specify first?"
   Never generate implementation code without an approved spec.
   A plan.md or tasks.md without a corresponding spec.md is not sufficient.
 
@@ -308,8 +308,8 @@ DIRECTIVE 5 — BLAMELESS LEARNING (when errors or failures occur)
 | If you need to... | Do this |
 |---|---|
 | Change spec or acceptance criteria | Stop. Ask user. Only Spec-Kit output is authoritative. |
-| Change `tasks.md` | Stop. Ask user to re-run `/speckit.tasks`. |
-| Change `constitution.md` | Stop. Ask user to re-run `/speckit.constitution`. |
+| Change `tasks.md` | Stop. Ask user to re-run `/speckit-tasks`. |
+| Change `constitution.md` | Stop. Ask user to re-run `/speckit-constitution`. |
 | Add a new dependency | Stop. Check constitution dep policy. Ask if not listed. |
 | Touch a protected path | Stop. Name the conflict. Wait for explicit approval. |
 | Fix unrelated code you noticed | Mention in output. Do not touch it unless asked. |
@@ -325,7 +325,7 @@ DIRECTIVE 5 — BLAMELESS LEARNING (when errors or failures occur)
 | Framework | N/A — pure Markdown; interactive explorer is pre-built React HTML |
 | Database | N/A |
 | Test runner | `node --test` (`npm test`, built into Node — no deps) for `scripts/` · `markdownlint` (lint) · `markdown-link-check` (broken links) · `cspell` (spell check) |
-| CI command | `npm test && npm run lint:docs && npm run lint:skills && npm run lint:evals && npm run check:toolchain && npm run check:explorer` (the full pipeline also runs markdownlint, markdown-link-check and cspell — see `.github/workflows/docs-ci.yml`) |
+| CI command | `npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run check:toolchain && npm run check:explorer` (the full pipeline also runs markdownlint, markdown-link-check and cspell — see `.github/workflows/docs-ci.yml`) |
 | Node baseline | Node 22+ (`engines`), developed against `.nvmrc`. Enforced by `npm run check:toolchain`. See `docs/toolchain.md` |
 | Coverage floor | N/A for docs. Every script in `scripts/` that a CI job depends on must have a test file in `test/`. |
 | Protected paths | `design/cookbook-explorer.html` (generated bundle — do not hand-edit; rebuild from `design/src/` via `npm run build:explorer`) |
