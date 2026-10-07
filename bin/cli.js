@@ -15,18 +15,10 @@ const subcommands = {
   'install-agent-tracing': './install-agent-tracing.js'
 };
 
-// Coding-agent environments the installer can target. `tool` is passed through
-// to the underlying installer via `--tool <tool>`. "others" lands in a generic
-// .coding/ folder the user renames to whatever their agent expects.
-const ENVIRONMENTS = [
-  { tool: 'claude', label: 'Claude Code', dir: '.claude/skills' },
-  { tool: 'cursor', label: 'Cursor', dir: '.cursor/skills' },
-  { tool: 'vscode', label: 'GitHub Copilot (VS Code)', dir: '.github/skills' },
-  { tool: 'codex', label: 'OpenAI Codex', dir: '.codex/skills' },
-  { tool: 'antigravity', label: 'Google Antigravity', dir: '.agents/skills' },
-  { tool: 'roo', label: 'Roo Code', dir: '.roo/skills' },
-  { tool: 'others', label: 'Others (installs to .coding/, rename it afterward)', dir: '.coding/skills' }
-];
+// Coding-agent environments the installer can target, and where each one
+// reads skills from, come from one shared table so the picker and the
+// installers cannot disagree. `tool` is passed through as `--tool <tool>`.
+const { ENVIRONMENTS } = require('./tool-profiles.js');
 
 function showHelp() {
   process.stdout.write(
@@ -47,11 +39,13 @@ function showHelp() {
       '  \x1b[1magent-tracing\x1b[0m     Traces an agent to the OpenTelemetry GenAI conventions, with a name gate.',
       '',
       '\x1b[1mSupported coding-agent environments:\x1b[0m',
-      '  claude · cursor · vscode (GitHub Copilot) · codex · antigravity · roo · others',
+      '  agents · claude · cursor · vscode (GitHub Copilot) · codex · antigravity · roo · others',
+      '  "agents" writes to .agents/skills — the shared folder most agents now read, so one',
+      '  install works in several tools at once. Pick it if you are not sure.',
       '  "others" installs into a .coding/ folder you rename to match your tool afterward.',
       '',
       '\x1b[1mOptions (passed through to installer):\x1b[0m',
-      '  --tool <name>    Target tool: claude (default) | cursor | vscode | codex | antigravity | roo | others | custom',
+      '  --tool <name>    Target tool: agents (portable) | claude (default) | cursor | vscode | codex | antigravity | roo | others | custom',
       '  --target <dir>   With --tool custom, directory where SKILL.md will land',
       '  --user           Install the skill to the tool\'s user-global config directory',
       '  --force          Overwrite existing files',

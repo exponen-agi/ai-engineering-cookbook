@@ -18,7 +18,7 @@
  *   install-skill-review [options]
  *
  * Options:
- *   --tool <name>   Target tool: claude | cursor | roo | vscode | codex | antigravity | others | custom.
+ *   --tool <name>   Target tool: agents | claude | cursor | vscode | codex | antigravity | roo | others | custom.
  *                   Default: claude. (Controls only where SKILL.md lands.)
  *                   "others" installs into a .coding/ folder to rename later.
  *   --target <dir>  With --tool custom, install SKILL.md under <dir>/skill-review/.
@@ -32,7 +32,6 @@
 
 const fs = require("fs");
 const path = require("path");
-const os = require("os");
 
 const args = process.argv.slice(2);
 function flagValue(name) {
@@ -59,7 +58,7 @@ if (opts.help) {
       "  install-skill-review [options]",
       "",
       "Options:",
-      "  --tool <name>   claude (default) | cursor | roo | vscode | codex | antigravity | others | custom",
+      "  --tool <name>   agents (portable) | claude (default) | cursor | vscode | codex | antigravity | roo | others | custom",
       "  --target <dir>  Required with --tool custom. Skill lands at <dir>/skill-review/SKILL.md.",
       "  --user          Install SKILL.md to user-global dir if supported. Gate stays project-scoped.",
       "  --skill-only    Install only SKILL.md; skip the checker script.",
@@ -85,65 +84,23 @@ const SKILL_SRC = path.join(PKG_ROOT, "skills", SKILL_NAME, "SKILL.md");
 const CHECKER_SRC = path.join(PKG_ROOT, "scripts", "check-skills.js");
 
 // --- Resolve target paths per tool --------------------------------------
-const TOOL_PROFILES = {
-  claude: {
-    label: "Claude Code",
-    skillsDirProject: ".claude/skills",
-    skillsDirUser: path.join(os.homedir(), ".claude", "skills"),
-    supportsUser: true,
-  },
-  cursor: { label: "Cursor", skillsDirProject: ".cursor/skills", supportsUser: false },
-  roo: { label: "Roo Code", skillsDirProject: ".roo/skills", supportsUser: false },
-  vscode: {
-    label: "VS Code Copilot",
-    skillsDirProject: ".github/skills",
-    skillsDirUser:
-      process.platform === "win32" && process.env.APPDATA
-        ? path.join(process.env.APPDATA, "github-copilot", "skills")
-        : path.join(os.homedir(), ".copilot", "skills"),
-    supportsUser: true,
-  },
-  codex: {
-    label: "OpenAI Codex",
-    skillsDirProject: ".codex/skills",
-    skillsDirUser: path.join(os.homedir(), ".codex", "skills"),
-    supportsUser: true,
-  },
-  antigravity: {
-    label: "Google Antigravity",
-    skillsDirProject: ".agents/skills",
-    skillsDirUser: path.join(os.homedir(), ".gemini", "antigravity", "skills"),
-    supportsUser: true,
-  },
-  others: {
-    label: "Other / unlisted agent",
-    skillsDirProject: ".coding/skills",
-    supportsUser: false,
-    renameNote: true,
-  },
-  custom: { label: "Custom", supportsUser: false },
-};
+// Where each agent reads skills from lives in one shared table, so the CLI
+// picker and all three installers cannot disagree. See bin/tool-profiles.js.
+const { resolveSkillsBase, legacyInstallNotice } = require("./tool-profiles.js");
 
-const profile = TOOL_PROFILES[opts.tool];
-if (!profile) {
-  process.stderr.write(`! unknown --tool "${opts.tool}". Known: ${Object.keys(TOOL_PROFILES).join(", ")}\n`);
+const resolved = resolveSkillsBase({
+  tool: opts.tool,
+  user: opts.user,
+  target: opts.target,
+  cwd: process.cwd(),
+});
+if (!resolved.ok) {
+  process.stderr.write(`! ${resolved.error}\n`);
   process.exit(2);
 }
-if (opts.tool === "custom" && !opts.target) {
-  process.stderr.write("! --tool custom requires --target <dir>\n");
-  process.exit(2);
-}
-if (opts.user && !profile.supportsUser) {
-  process.stderr.write(`! --user is not supported for ${profile.label} (project-scoped only)\n`);
-  process.exit(2);
-}
+const { base: skillsBase, profile } = resolved;
 
-const skillsBase =
-  opts.tool === "custom"
-    ? path.resolve(opts.target)
-    : opts.user
-      ? profile.skillsDirUser
-      : path.resolve(process.cwd(), profile.skillsDirProject);
+const legacyNotice = legacyInstallNotice(profile, process.cwd());
 
 const SKILL_DEST = path.join(skillsBase, SKILL_NAME, "SKILL.md");
 const cwd = process.cwd();
@@ -186,6 +143,10 @@ if (!opts.skillOnly) {
 }
 
 log("");
+if (legacyNotice) {
+  log(`\x1b[1m\x1b[33m! ${legacyNotice}\x1b[0m`);
+  log("");
+}
 log("Done. Next steps:");
 if (opts.tool === "claude") {
   log("  1. Restart Claude Code (or open a new session) so the skill registers.");

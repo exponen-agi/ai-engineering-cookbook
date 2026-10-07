@@ -273,6 +273,12 @@
       Cursor, Copilot, Codex, Antigravity and Roo Code. The installer asks which one you use.
       You need <strong>Node.js 22 or newer</strong> and nothing else.
     </p>
+    <p class="sub">
+      Not sure which to pick? Choose <strong>Any agent</strong>. It writes to
+      <code>.agents/skills</code>, the shared folder most agents now read, so one install
+      covers several tools. Claude Code reads only <code>.claude/skills</code>, so pick that
+      as well if you use it.
+    </p>
     <pre><code><span class="c"># Works the same on macOS, Windows (PowerShell) and Linux</span>
 npx ai-engineering-cookbook
 
@@ -291,10 +297,11 @@ npx ai-engineering-cookbook doc-coherence --dry-run</code></pre>
   <div class="wrap">
     <h2>Before you install a skill somebody else wrote</h2>
     <p class="sub">
-      A skill is a file your agent reads and obeys, with nobody watching at the moment it runs.
-      Some skills carry instructions you physically cannot see: Unicode has characters with no
-      width, no colour and no gap under the cursor. You review one document; your agent obeys
-      another.
+      A skill is a <strong>folder</strong> your agent reads and obeys, with nobody watching at the
+      moment it runs. Two things make reviewing it harder than it looks. A registry shows you
+      <code>SKILL.md</code>, but the script sitting next to it is what actually runs. And a file can
+      carry instructions you physically cannot see: Unicode has characters with no width, no colour
+      and no gap under the cursor. You review one document; your agent obeys another.
     </p>
 
     <div class="compare">
@@ -320,9 +327,11 @@ npx ai-engineering-cookbook doc-coherence --dry-run</code></pre>
     </p>
 
     <ol class="gate">
-      <li>Run <code>node scripts/check-skills.js</code> on the skill folder. Exit <code>1</code> means stop.</li>
+      <li>Run <code>node scripts/check-skills.js</code> on the skill folder. It reads every file in
+        there, not just <code>SKILL.md</code>. Exit <code>1</code> means stop.</li>
       <li>Then read the body yourself, for anything that serves somebody other than you.</li>
-      <li>Copy it into your own repository so it cannot change after you approved it.</li>
+      <li>Open every bundled script. They run with all of your permissions.</li>
+      <li>Copy it into your own repository and pin it, so it cannot change after you approved it.</li>
     </ol>
 
     <p class="sub" style="margin-top:18px">
