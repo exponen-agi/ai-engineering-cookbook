@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "node --test",
-    "lint:docs": "node scripts/check-doc-coherence.js",
+    "lint:docs": "node scripts/check-doc-coherence.js --strict",
     "lint:skills": "node scripts/check-skills.js skills --strict",
     "lint:semconv": "node scripts/check-semconv.js templates/tracing --strict",
     "lint:evals": "node scripts/check-evals.js templates/evals --strict",
@@ -26,7 +26,8 @@
     "skills/",
     "hooks/",
     "scripts/",
-    "templates/"
+    "templates/",
+    ".github/workflows/doc-coherence.yml"
   ],
   "engines": {
     "node": ">=22"

@@ -226,24 +226,15 @@ This skill works on its own, with no tools. On **Claude Code** the installer
 also sets up a session-start hook by default, which nudges you to sharpen a
 vague prompt *before* it is sent rather than after it produces a poor answer.
 
-```bash
-# macOS and Linux — skill plus the hook (the default on Claude Code)
-npx ai-engineering-cookbook prompt-optimizer
-
-# Skill only, no hook
-npx ai-engineering-cookbook prompt-optimizer --no-hook
-```
-
-```powershell
-# Windows (PowerShell) — identical commands
-npx ai-engineering-cookbook prompt-optimizer
-npx ai-engineering-cookbook prompt-optimizer --no-hook
-```
-
 The hook is `hooks/prompt-optimizer-gate.js`. It is advisory: it never blocks a
 prompt, and it stays silent for slash commands and for anything already
-substantial. Every other agent gets the skill without a hook, because the hook
-format is Claude Code's — nothing in this skill depends on it.
+substantial. It is installed **by default** on Claude Code; pass `--no-hook` to
+the installer to take the skill without it. Every other agent gets the skill
+alone, because the hook format is Claude Code's — nothing here depends on it.
+
+Install and re-install commands live in the guide, so there is one copy of them
+to keep correct:
+[Prompt Optimizer](https://github.com/exponen-agi/ai-engineering-cookbook/blob/main/docs/prompt-optimizer.md).
 
 ---
 

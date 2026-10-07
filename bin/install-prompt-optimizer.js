@@ -14,7 +14,7 @@
  *   install-prompt-optimizer [options]
  *
  * Options:
- *   --tool <name>   Target tool: claude | cursor | roo | vscode | codex | antigravity | others | custom.
+ *   --tool <name>   Target tool: agents | claude | cursor | vscode | codex | antigravity | roo | others | custom.
  *                   Default: claude. "others" installs into a .coding/ folder to rename later.
  *   --target <dir>  With --tool custom, install SKILL.md under <dir>/<name>/.
  *   --user          Install to the tool's user-global config dir if supported.
@@ -56,7 +56,7 @@ if (opts.help) {
       "  install-prompt-optimizer [options]",
       "",
       "Options:",
-      "  --tool <name>   claude (default) | cursor | roo | vscode | codex | antigravity | others | custom",
+      "  --tool <name>   agents (portable) | claude (default) | cursor | vscode | codex | antigravity | roo | others | custom",
       "  --target <dir>  Required with --tool custom. Skill lands at <dir>/prompt-optimizer/SKILL.md.",
       "  --user          Install to user-global dir if supported (claude, codex, antigravity, vscode).",
       "  --no-hook       Claude Code only: skill only; skip the session-start gate hook.",
@@ -89,76 +89,40 @@ const SKILL_SRC = path.join(PKG_ROOT, "skills", SKILL_NAME, "SKILL.md");
 const HOOK_SRC = path.join(PKG_ROOT, "hooks", "prompt-optimizer-gate.js");
 
 // --- Resolve target paths per tool --------------------------------------
-const TOOL_PROFILES = {
-  claude: {
-    label: "Claude Code",
-    skillsDirProject: ".claude/skills",
-    skillsDirUser: path.join(os.homedir(), ".claude", "skills"),
-    supportsUser: true,
-    supportsHook: true,
-    hooksDirProject: ".claude/hooks",
-    hooksDirUser: path.join(os.homedir(), ".claude", "hooks"),
-    settingsPathProject: ".claude/settings.json",
-    settingsPathUser: path.join(os.homedir(), ".claude", "settings.json"),
-  },
-  cursor: { label: "Cursor", skillsDirProject: ".cursor/skills", supportsUser: false, supportsHook: false },
-  roo: { label: "Roo Code", skillsDirProject: ".roo/skills", supportsUser: false, supportsHook: false },
-  vscode: {
-    label: "VS Code Copilot",
-    skillsDirProject: ".github/skills",
-    skillsDirUser:
-      process.platform === "win32" && process.env.APPDATA
-        ? path.join(process.env.APPDATA, "github-copilot", "skills")
-        : path.join(os.homedir(), ".copilot", "skills"),
-    supportsUser: true,
-    supportsHook: false,
-  },
-  codex: {
-    label: "OpenAI Codex",
-    skillsDirProject: ".codex/skills",
-    skillsDirUser: path.join(os.homedir(), ".codex", "skills"),
-    supportsUser: true,
-    supportsHook: false,
-  },
-  antigravity: {
-    label: "Google Antigravity",
-    skillsDirProject: ".agents/skills",
-    skillsDirUser: path.join(os.homedir(), ".gemini", "antigravity", "skills"),
-    supportsUser: true,
-    supportsHook: false,
-  },
-  others: {
-    label: "Other / unlisted agent",
-    skillsDirProject: ".coding/skills",
-    supportsUser: false,
-    supportsHook: false,
-    renameNote: true,
-  },
-  custom: { label: "Custom", supportsUser: false, supportsHook: false },
-};
+const { TOOL_PROFILES: BASE_PROFILES, resolveSkillsBase, legacyInstallNotice } = require("./tool-profiles.js");
 
-const profile = TOOL_PROFILES[opts.tool];
-if (!profile) {
-  process.stderr.write(`! unknown --tool "${opts.tool}". Known: ${Object.keys(TOOL_PROFILES).join(", ")}\n`);
+// Where each agent reads skills from lives in one shared table — see
+// bin/tool-profiles.js. Only the session-start hook is specific to this
+// installer, so only that is layered on here.
+const TOOL_PROFILES = Object.fromEntries(
+  Object.entries(BASE_PROFILES).map(([tool, profile]) => [
+    tool,
+    tool === "claude"
+      ? {
+          ...profile,
+          supportsHook: true,
+          hooksDirProject: ".claude/hooks",
+          hooksDirUser: path.join(os.homedir(), ".claude", "hooks"),
+          settingsPathProject: ".claude/settings.json",
+          settingsPathUser: path.join(os.homedir(), ".claude", "settings.json"),
+        }
+      : { ...profile, supportsHook: false },
+  ]),
+);
+
+const resolved = resolveSkillsBase({
+  tool: opts.tool,
+  user: opts.user,
+  target: opts.target,
+  cwd: process.cwd(),
+});
+if (!resolved.ok) {
+  process.stderr.write(`! ${resolved.error}\n`);
   process.exit(2);
 }
+const { base: skillsBase, profile } = resolved;
 
-if (opts.tool === "custom" && !opts.target) {
-  process.stderr.write("! --tool custom requires --target <dir>\n");
-  process.exit(2);
-}
-
-if (opts.user && !profile.supportsUser) {
-  process.stderr.write(`! --user is not supported for ${profile.label} (project-scoped only)\n`);
-  process.exit(2);
-}
-
-const skillsBase =
-  opts.tool === "custom"
-    ? path.resolve(opts.target)
-    : opts.user
-      ? profile.skillsDirUser
-      : path.resolve(process.cwd(), profile.skillsDirProject);
+const legacyNotice = legacyInstallNotice(profile, process.cwd());
 
 const SKILL_DEST = path.join(skillsBase, SKILL_NAME, "SKILL.md");
 
@@ -254,6 +218,10 @@ if (profile.supportsHook && !opts.noHook) {
 }
 
 log("");
+if (legacyNotice) {
+  log(`\x1b[1m\x1b[33m! ${legacyNotice}\x1b[0m`);
+  log("");
+}
 log("Done. Next steps:");
 if (opts.tool === "claude") {
   log("  1. Restart Claude Code (or open a new session) so settings.json reloads.");

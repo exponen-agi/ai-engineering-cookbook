@@ -59,23 +59,30 @@ Installs `skills/doc-coherence/SKILL.md` into the tool's skills directory (defau
 *(If running via global or local installation, replace `npx ai-engineering-cookbook` with `ai-engineering-cookbook` or your preferred path).*
 
 ```bash
+# Any agent reading the shared folder (portable — start here)
+#                             → .agents/skills/doc-coherence/
+npx ai-engineering-cookbook doc-coherence --tool agents
+
 # Claude Code (default)       → .claude/skills/doc-coherence/
 npx ai-engineering-cookbook doc-coherence
 
-# Cursor                      → .cursor/skills/doc-coherence/
+# Cursor (project)            → .cursor/skills/doc-coherence/
+# Cursor (global)             → ~/.cursor/skills/doc-coherence/
 npx ai-engineering-cookbook doc-coherence --tool cursor
 
-# Roo Code                    → .roo/skills/doc-coherence/
+# Roo Code (project)          → .roo/skills/doc-coherence/
+# Roo Code (global)           → ~/.roo/skills/doc-coherence/
 npx ai-engineering-cookbook doc-coherence --tool roo
 
 # VS Code Copilot (project)   → .github/skills/doc-coherence/
-# VS Code Copilot (global)    → ~/.copilot/skills/doc-coherence/
-#                                (Windows: %APPDATA%\github-copilot\skills\)
+# VS Code Copilot (global)    → ~/.copilot/skills/doc-coherence/   (same on Windows)
 npx ai-engineering-cookbook doc-coherence --tool vscode
 npx ai-engineering-cookbook doc-coherence --tool vscode --user
 
-# OpenAI Codex (project)      → .codex/skills/doc-coherence/
-# OpenAI Codex (global)       → ~/.codex/skills/doc-coherence/
+# OpenAI Codex (project)      → .agents/skills/doc-coherence/
+# OpenAI Codex (global)       → ~/.agents/skills/doc-coherence/
+#   Codex reads .agents/skills, never .codex/skills. If an older install left
+#   a .codex/skills folder behind, delete it.
 npx ai-engineering-cookbook doc-coherence --tool codex
 npx ai-engineering-cookbook doc-coherence --tool codex --user
 

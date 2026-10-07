@@ -110,19 +110,32 @@ Use `npx` when you want to adapt a skill to your project. Use the marketplace wh
 
 Skills are not Claude-only. Run the bare command and the installer asks which agent environment(s) you want — you can **multi-select** by entering comma-separated numbers (e.g. `1,3,5`):
 
-| Environment | Skill folder |
-| :--- | :--- |
-| Claude Code | `.claude/skills` |
-| Cursor | `.cursor/skills` |
-| GitHub Copilot (VS Code) | `.github/skills` |
-| OpenAI Codex | `.codex/skills` |
-| Google Antigravity | `.agents/skills` |
-| Roo Code | `.roo/skills` |
-| **Others** | `.coding/skills` → rename `.coding/` to your tool's folder after install |
+| Environment | Project folder | Your-user folder (`--user`) |
+| :--- | :--- | :--- |
+| **Any agent (recommended)** | `.agents/skills` | `~/.agents/skills` |
+| Claude Code | `.claude/skills` | `~/.claude/skills` |
+| Cursor | `.cursor/skills` | `~/.cursor/skills` |
+| GitHub Copilot (VS Code) | `.github/skills` | `~/.copilot/skills` |
+| OpenAI Codex | `.agents/skills` | `~/.agents/skills` |
+| Google Antigravity | `.agents/skills` | `~/.gemini/antigravity/skills` |
+| Roo Code | `.roo/skills` | `~/.roo/skills` |
+| **Others** | `.coding/skills` → rename `.coding/` to your tool's folder after install | — |
+
+**Which should you pick?** If you are unsure, pick **Any agent**. `.agents/skills`
+is the shared folder that most agents now read, so one install works in several
+tools at once. The vendor folders above still work for the tool that owns them,
+and Claude Code reads only its own — so pick **Claude Code** if that is all you use.
+
+> [!NOTE]
+> **Codex changed.** OpenAI documents `.agents/skills` as the only project
+> location Codex reads; a `.codex/skills` folder is ignored. Earlier versions of
+> this installer wrote there, so if you have a `.codex/skills` folder left over,
+> delete it — the installer now says so when it finds one.
 
 Pick **Others** for any agent not in the list: the skill lands in a generic `.coding/` folder and the installer tells you to rename it to whatever directory your tool reads. You can also target a specific tool non-interactively with `--tool`:
 
 ```bash
+npx ai-engineering-cookbook doc-coherence --tool agents    # portable: .agents/skills
 npx ai-engineering-cookbook doc-coherence --tool cursor
 npx ai-engineering-cookbook prompt-optimizer --tool codex
 npx ai-engineering-cookbook prompt-optimizer --tool others   # → .coding/, rename afterward
@@ -132,7 +145,7 @@ npx ai-engineering-cookbook prompt-optimizer --tool others   # → .coding/, ren
 | :--- | :--- | :--- |
 | **🎯 [Prompt Optimizer](./docs/prompt-optimizer.md)** | Turns vague requests into production-grade prompts — framework selection, model calibration, red-team, scorecard. Optional Claude Code session-start gate. | `npx ai-engineering-cookbook prompt-optimizer` |
 | **🔗 [Doc Coherence](./docs/doc-coherence.md)** | Single-source-of-truth registry + deterministic CI gate that fails the build when one doc restates a fact owned by another. | `npx ai-engineering-cookbook doc-coherence` |
-| **🔍 [Skill Review](./docs/skill-review.md)** | Vets a `SKILL.md` before you install, publish or trust it — spec conformance, portable vs vendor-only fields, and characters a reviewer cannot see. Ships a deterministic CI gate. | `npx ai-engineering-cookbook skill-review` |
+| **🔍 [Skill Review](./docs/skill-review.md)** | Vets a whole skill folder before you install, publish or trust it — bundled scripts, spec conformance, portable vs vendor-only fields, risky commands, and characters a reviewer cannot see. Ships a deterministic CI gate. | `npx ai-engineering-cookbook skill-review` |
 | **📡 [Agent Tracing](./docs/agent-tracing.md)** | Traces an agent with the OpenTelemetry GenAI conventions — spans for turns, model calls, tool calls and skill loads, plus token cost. Ships a deterministic attribute-name gate. | `npx ai-engineering-cookbook agent-tracing` |
 | **📊 [Eval Harness](./docs/eval-harness.md)** | Builds an eval suite that can actually fail — golden dataset, cheapest-scorer ladder, pass-rate threshold. Ships a deterministic CI gate that catches a suite which silently passes everything. | `npx ai-engineering-cookbook eval-harness` |
 
@@ -193,7 +206,7 @@ ai-engineering-cookbook prompt-optimizer
 | **🧪 [Eval Harness Skill](./docs/eval-harness.md)** | Building the eval suite itself, and proving it can fail. Install via [Installable Skills](#-installable-skills). | Dataset design, scorer ladder, thresholds, the `check-evals` gate |
 | **🛡️ [Agent Security](./docs/agent-security.md)** | Stopping an agent from being turned against you by the text it reads. | Prompt injection, the lethal trifecta, reviewing a skill before you install it, scanning a skill for invisible instructions |
 | **🔗 [Doc Coherence Skill](./docs/doc-coherence.md)** | Single-source-of-truth registry + CI gate that flags cross-doc drift. Install via [Installable Skills](#-installable-skills). | Canonical owners, authority order, deterministic gate |
-| **🔍 [Skill Review Skill](./docs/skill-review.md)** | Checking a `SKILL.md` before you trust it, and writing one that works in every tool. Install via [Installable Skills](#-installable-skills). | The six portable fields, hidden characters, the `check-skills` gate |
+| **🔍 [Skill Review Skill](./docs/skill-review.md)** | Checking a whole skill folder before you trust it, and writing one that works in every tool. Install via [Installable Skills](#-installable-skills). | Bundled scripts, the six portable fields, hidden characters, the `check-skills` gate |
 | **📡 [Agent Tracing Skill](./docs/agent-tracing.md)** | Seeing what an agent actually did — spans, token cost, and which skill it loaded. Install via [Installable Skills](#-installable-skills). | OTel GenAI conventions, `gen_ai.skill.*`, the `check-semconv` gate |
 | **🔧 [Troubleshooting](./docs/troubleshooting.md)** | Common failure scenarios and step-by-step fixes. | Install errors, TDD issues, phantom completions |
 | **🧱 [Toolchain & Node Baseline](./docs/toolchain.md)** | Which Node.js version this repo needs, and why every CI tool is pinned. | Node baseline, pinned CI tools, the `check:toolchain` gate |
@@ -220,7 +233,7 @@ Not sure where to begin? Follow this sequence:
 | 9 | **Building a feature that calls a model** and need to score it | [Evaluation & Observability](./docs/evaluation-and-observability.md) |
 | 10 | **Ready to write the eval suite** and make it block bad merges | [Eval Harness](./docs/eval-harness.md) |
 | 11 | **About to connect a tool or install a skill** you did not write | [Agent Security](./docs/agent-security.md) |
-| 12 | **Holding a skill file** and wondering whether it is safe and portable | [Skill Review](./docs/skill-review.md) |
+| 12 | **Holding a skill folder** and wondering whether it is safe and portable | [Skill Review](./docs/skill-review.md) |
 | 13 | **Stuck on something** | [Troubleshooting Guide](./docs/troubleshooting.md) |
 | 14 | **Want to contribute** | [Contributing Guide](./CONTRIBUTING.md) |
 

@@ -113,20 +113,27 @@ The session-start auto-gate is Claude-Code-specific. Everywhere else you **invok
 *(If running via global or local installation, replace `npx ai-engineering-cookbook` with `ai-engineering-cookbook` or your preferred path).*
 
 ```bash
-# Cursor                      → .cursor/skills/prompt-optimizer/
+# Any agent reading the shared folder (portable — start here)
+#                             → .agents/skills/prompt-optimizer/
+npx ai-engineering-cookbook prompt-optimizer --tool agents
+
+# Cursor (project)            → .cursor/skills/prompt-optimizer/
+# Cursor (global)             → ~/.cursor/skills/prompt-optimizer/
 npx ai-engineering-cookbook prompt-optimizer --tool cursor
 
-# Roo Code                    → .roo/skills/prompt-optimizer/
+# Roo Code (project)          → .roo/skills/prompt-optimizer/
+# Roo Code (global)           → ~/.roo/skills/prompt-optimizer/
 npx ai-engineering-cookbook prompt-optimizer --tool roo
 
 # VS Code Copilot (project)   → .github/skills/prompt-optimizer/
-# VS Code Copilot (global)    → ~/.copilot/skills/prompt-optimizer/
-#                                (Windows: %APPDATA%\github-copilot\skills\)
+# VS Code Copilot (global)    → ~/.copilot/skills/prompt-optimizer/   (same on Windows)
 npx ai-engineering-cookbook prompt-optimizer --tool vscode
 npx ai-engineering-cookbook prompt-optimizer --tool vscode --user
 
-# OpenAI Codex (project)      → .codex/skills/prompt-optimizer/
-# OpenAI Codex (global)       → ~/.codex/skills/prompt-optimizer/
+# OpenAI Codex (project)      → .agents/skills/prompt-optimizer/
+# OpenAI Codex (global)       → ~/.agents/skills/prompt-optimizer/
+#   Codex reads .agents/skills, never .codex/skills. If an older install left
+#   a .codex/skills folder behind, delete it.
 npx ai-engineering-cookbook prompt-optimizer --tool codex
 npx ai-engineering-cookbook prompt-optimizer --tool codex --user
 
@@ -153,10 +160,10 @@ Most modern agents auto-discover skills via the `name` + `description` in the SK
 | Tool | Project scope | User scope | Auto-gate shipped by this installer? | Tool's own hook system |
 | :--- | :--- | :--- | :--- | :--- |
 | **Claude Code** | `.claude/skills/` | `~/.claude/skills/` | ✅ Yes | `UserPromptSubmit` ([docs](https://code.claude.com/docs/en/hooks-guide)) |
-| **Cursor** | `.cursor/skills/` | — (project only, [per docs](https://cursor.com/docs/skills)) | ❌ Not yet | `beforeSubmitPrompt` since v1.7 ([Cursor Hooks docs](https://cursor.com/docs/hooks)) — port feasible |
-| **Roo Code** | `.roo/skills/` | — (project only) | ❌ No | No equivalent prompt-submit hook |
-| **VS Code Copilot** | `.github/skills/` | `~/.copilot/skills/` (Windows: `%APPDATA%\github-copilot\skills\`) | ❌ No | No equivalent prompt-submit hook today |
-| **OpenAI Codex** | `.codex/skills/` | `~/.codex/skills/` | ❌ Not yet | `UserPromptSubmit`, `SessionStart`, etc. ([Codex Hooks docs](https://developers.openai.com/codex/hooks)) — port feasible |
+| **Cursor** | `.cursor/skills/` (also reads `.agents/skills/`) | `~/.cursor/skills/` ([per docs](https://cursor.com/docs/skills)) | ❌ Not yet | `beforeSubmitPrompt` since v1.7 ([Cursor Hooks docs](https://cursor.com/docs/hooks)) — port feasible |
+| **Roo Code** | `.roo/skills/` | `~/.roo/skills/` | ❌ No | No equivalent prompt-submit hook |
+| **VS Code Copilot** | `.github/skills/` (also reads `.agents/skills/`) | `~/.copilot/skills/` (same on Windows) | ❌ No | No equivalent prompt-submit hook today |
+| **OpenAI Codex** | `.agents/skills/` | `~/.agents/skills/` | ❌ Not yet | `UserPromptSubmit`, `SessionStart`, etc. ([Codex Hooks docs](https://developers.openai.com/codex/hooks)) — port feasible |
 | **Google Antigravity** | `.agents/skills/` | `~/.gemini/antigravity/skills/` | ❌ No | Skill lifecycle hooks exist but no prompt-submit equivalent confirmed |
 | **Custom** | `<--target>/` | — | ❌ No | N/A |
 

