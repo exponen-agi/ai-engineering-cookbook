@@ -17,6 +17,7 @@
     "lint:skills": "node scripts/check-skills.js skills --strict",
     "lint:semconv": "node scripts/check-semconv.js templates/tracing --strict",
     "lint:evals": "node scripts/check-evals.js templates/evals --strict",
+    "lint:hidden": "node scripts/check-hidden-chars.js --strict",
     "check:toolchain": "node scripts/check-toolchain.js",
     "build:explorer": "node scripts/build-explorer.js",
     "check:explorer": "node scripts/build-explorer.js --check"

@@ -128,12 +128,12 @@ Replace `my-skill` with your skill's name (lowercase, hyphens, no spaces).
 
 ```bash
 # macOS and Linux
-npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run check:toolchain && npm run check:explorer
+npm test && npm run lint:docs && npm run lint:skills && npm run lint:semconv && npm run lint:evals && npm run lint:hidden && npm run check:toolchain && npm run check:explorer
 ```
 
 ```powershell
 # Windows (PowerShell) — identical
-npm test; npm run lint:docs; npm run lint:skills; npm run lint:semconv; npm run lint:evals; npm run check:toolchain; npm run check:explorer
+npm test; npm run lint:docs; npm run lint:skills; npm run lint:semconv; npm run lint:evals; npm run lint:hidden; npm run check:toolchain; npm run check:explorer
 ```
 
 > [!NOTE]
@@ -160,6 +160,7 @@ Before opening a PR, confirm all items:
 - [ ] `npm test` passes (runs the unit tests for the scripts in `scripts/` — needs Node 22 or newer; no install step required)
 - [ ] `npm run lint:docs` passes (the doc-coherence gate)
 - [ ] `npm run lint:skills` passes (every `SKILL.md` uses only the six portable frontmatter fields — see [Skill Review](./docs/skill-review.md))
+- [ ] `npm run lint:hidden` passes (no invisible characters anywhere in the repo — see [Skill Review](./docs/skill-review.md#the-same-scan-across-the-whole-repository))
 - [ ] `npm run lint:evals` passes (the example eval dataset still passes its own gate — see [Eval Harness](./docs/eval-harness.md))
 - [ ] `npm run check:toolchain` passes (Node baseline and pinned CI tools — see [Toolchain](./docs/toolchain.md))
 - [ ] `npm run check:explorer` passes (if you touched `design/src/`, rebuild with `npm run build:explorer` and commit the bundle)

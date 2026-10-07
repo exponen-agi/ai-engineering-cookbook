@@ -242,6 +242,35 @@ say so in `compatibility` so your teammates are not surprised.
 | `<` or `>` in a frontmatter value | warning | Frontmatter is pasted into the agent's prompt, which for several models is a tag-structured document. A `<` can be read as opening a tag. Write `under 300 tokens`, not `<300 tokens` |
 | Emoji joiners (`U+200D`, `U+FE0F`) | **ignored** | 👩‍💻 and ⚠️ are built from these. A gate that fires on emoji is a gate people switch off |
 
+#### The same scan, across the whole repository
+
+`check-skills` only looks inside skill folders. Your docs are read by agents
+too — `CLAUDE.md` and `AGENTS.md` tell them which files to load — so the same
+character rules can run over every text file in a repository:
+
+```bash
+# macOS and Linux
+node scripts/check-hidden-chars.js --strict
+```
+
+```powershell
+# Windows (PowerShell)
+node scripts\check-hidden-chars.js --strict
+```
+
+It adds one rule of its own. Emoji joiners are fine in prose, but **inside a
+Markdown link target** (`[text](#target)`) they are always a bug: the link looks
+exactly like the right one and points nowhere. That rule is an **error**.
+
+| Option | Effect |
+| :--- | :--- |
+| `path ...` | Files or folders to scan (default: the current folder) |
+| `--ignore <path>` | Skip a path — for example a test file whose fixtures are hidden characters on purpose |
+| `--strict` | Warnings fail the run too |
+| `--json` | Machine-readable output |
+
+In this repository it runs as `npm run lint:hidden`.
+
 ### Risky commands — in `SKILL.md` and in every bundled file
 
 Every fenced block in a `SKILL.md` is a command an agent may run, so these
