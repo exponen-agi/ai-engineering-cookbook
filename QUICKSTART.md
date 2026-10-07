@@ -62,17 +62,30 @@ Let's build a small CLI calculator project to see the workflow in action.
 Create an empty folder and initialize Spec-Kit:
 
 ```bash
+# macOS and Linux
 mkdir cli-calculator
 cd cli-calculator
-specify init . --integration claude
+specify init . --integration claude --script sh
 ```
+
+```powershell
+# Windows (PowerShell)
+New-Item -ItemType Directory cli-calculator
+Set-Location cli-calculator
+specify init . --integration claude --script ps
+```
+
+> [!NOTE]
+> Replace `claude` with your own agent's integration key, and see
+> [why `--script` matters](./docs/installation.md#pick-the-helper-script-language-for-your-platform)
+> if your team mixes macOS and Windows.
 
 ### 2. Set Up Your Constitution
 
 Define the tech stack and guidelines that the agent must adhere to:
 
 ```
-/speckit.constitution Create principles:
+/speckit-constitution Create principles:
   - Tech stack: Node.js, Jest for unit testing
   - Constraint: Keep code structure minimal, standard ES modules
 ```
@@ -82,7 +95,7 @@ Define the tech stack and guidelines that the agent must adhere to:
 Describe what you want to build. Spec-Kit will write the specifications:
 
 ```
-/speckit.specify Build a simple calculator that performs addition and subtraction.
+/speckit-specify Build a simple calculator that performs addition and subtraction.
 ```
 
 *This creates the `.specify/specs/001-simple-calculator/spec.md` file and a new Git branch.*
@@ -92,11 +105,16 @@ Describe what you want to build. Spec-Kit will write the specifications:
 Let Spec-Kit ask questions and generate the step-by-step tasks:
 
 ```
-/speckit.clarify
+/speckit-clarify
 # Respond to questions, then plan and generate tasks:
-/speckit.plan
-/speckit.tasks
+/speckit-plan
+/speckit-tasks
 ```
+
+> [!NOTE]
+> `/speckit-clarify` is an **optional quality gate**. For a feature this small you
+> can skip straight to `/speckit-plan`. Use it when the spec has real ambiguity —
+> which, on anything a team will maintain, is most of the time.
 
 *This generates a `tasks.md` file, which is our formal checklist.*
 
@@ -112,7 +130,7 @@ Constraints:
   - Do not generate a new plan
     (Spec-Kit already generated the authoritative plan — regenerating wastes tokens and may contradict the approved spec)
   - Do not create a new git branch (already created by Spec-Kit)
-    (Spec-Kit created and checked out the feature branch during /speckit.specify — creating another would orphan your work)
+    (Spec-Kit created and checked out the feature branch during /speckit-specify — creating another would orphan your work)
   - Write tests before implementation code (TDD)
     (The RED phase — a test that fails before the code exists — is proof that the test actually verifies something)
 ```
@@ -134,15 +152,22 @@ You don't need to do anything during this process. Monitor the output and step i
 
 ## ⚡ Command & Skill Cheatsheet
 
-### Spec-Kit Commands (You Run These)
+### Spec-Kit Skills (You Run These In Your Agent's Chat)
 
-| Command | Purpose | Output File |
+> [!IMPORTANT]
+> These are **skills you type into your agent's chat**, not terminal commands — and
+> the prefix differs by agent (`/speckit-` in most, `$speckit-` in Codex CLI). The
+> full step list and the per-agent prefix table live in
+> [Installation → How to invoke Spec-Kit in your agent](./docs/installation.md#-how-to-invoke-spec-kit-in-your-agent).
+
+| Skill | Purpose | Output File |
 | :--- | :--- | :--- |
-| `/speckit.constitution` | Set project-wide rules & tech stack | `constitution.md` |
-| `/speckit.specify <idea>` | Describe feature delta / requirements | `spec.md` |
-| `/speckit.clarify` | Run interactive Q&A to resolve ambiguities | Appends to `spec.md` |
-| `/speckit.plan` | Design technical approach & files | `plan.md` |
-| `/speckit.tasks` | Convert plan into a checklist | `tasks.md` (Handoff) |
+| `/speckit-constitution` | Set project-wide rules & tech stack | `constitution.md` |
+| `/speckit-specify <idea>` | Describe feature delta / requirements | `spec.md` |
+| `/speckit-clarify` | Run interactive Q&A to resolve ambiguities *(optional gate)* | Appends to `spec.md` |
+| `/speckit-plan` | Design technical approach & files | `plan.md` |
+| `/speckit-tasks` | Convert plan into a checklist | `tasks.md` (Handoff) |
+| `/speckit-converge` | Re-check the built code against the spec and list what is still missing | Appends to `tasks.md` |
 
 ### Superpowers Skills (Triggered Automatically)
 

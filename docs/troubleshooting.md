@@ -115,13 +115,13 @@ Then re-paste the handoff message with all constraints included.
 
 ---
 
-### ❓ `/speckit.clarify` asks irrelevant or confusing questions
+### ❓ `/speckit-clarify` asks irrelevant or confusing questions
 
 **Symptom:** Spec-Kit asks questions that have nothing to do with your feature.
 
-**Cause:** The spec description in `/speckit.specify` was too vague or included implementation details (how) instead of user requirements (what).
+**Cause:** The spec description in `/speckit-specify` was too vague or included implementation details (how) instead of user requirements (what).
 
-**Fix:** Re-run `/speckit.specify` with a clearer, user-facing description:
+**Fix:** Re-run `/speckit-specify` with a clearer, user-facing description:
 
 - ❌ `Build a JWT auth system using bcryptjs and Express middleware`
 - ✅ `Allow users to log in with email and password. Return an error if credentials are wrong. Keep them logged in across page refreshes.`
@@ -164,9 +164,9 @@ Then re-paste the correct handoff message.
 
 **Symptom:** `.specify/specs/<feature>/plan.md` exists but `tasks.md` does not.
 
-**Cause:** You didn't run `/speckit.tasks` after `/speckit.plan`.
+**Cause:** You didn't run `/speckit-tasks` after `/speckit-plan`.
 
-**Fix:** Run `/speckit.tasks` — it converts the plan into the checkbox checklist. Don't paste the handoff message until `tasks.md` exists.
+**Fix:** Run `/speckit-tasks` — it converts the plan into the checkbox checklist. Don't paste the handoff message until `tasks.md` exists.
 
 ---
 

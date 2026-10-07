@@ -76,6 +76,9 @@ npx ai-engineering-cookbook prompt-optimizer
 
 # Install Skill Review
 npx ai-engineering-cookbook skill-review
+
+# Install Agent Tracing
+npx ai-engineering-cookbook agent-tracing
 ```
 
 *(You can also run `npx ai-engineering-cookbook` without arguments for an interactive menu that lets you pick a skill **and** select one or more coding-agent environments to install into.)*
@@ -107,6 +110,7 @@ npx ai-engineering-cookbook prompt-optimizer --tool others   # → .coding/, ren
 | **🎯 [Prompt Optimizer](./docs/prompt-optimizer.md)** | Turns vague requests into production-grade prompts — framework selection, model calibration, red-team, scorecard. Optional Claude Code session-start gate. | `npx ai-engineering-cookbook prompt-optimizer` |
 | **🔗 [Doc Coherence](./docs/doc-coherence.md)** | Single-source-of-truth registry + deterministic CI gate that fails the build when one doc restates a fact owned by another. | `npx ai-engineering-cookbook doc-coherence` |
 | **🔍 [Skill Review](./docs/skill-review.md)** | Vets a `SKILL.md` before you install, publish or trust it — spec conformance, portable vs vendor-only fields, and characters a reviewer cannot see. Ships a deterministic CI gate. | `npx ai-engineering-cookbook skill-review` |
+| **📡 [Agent Tracing](./docs/agent-tracing.md)** | Traces an agent with the OpenTelemetry GenAI conventions — spans for turns, model calls, tool calls and skill loads, plus token cost. Ships a deterministic attribute-name gate. | `npx ai-engineering-cookbook agent-tracing` |
 
 ### 🛠️ Troubleshooting & Installation Fallbacks
 
@@ -165,6 +169,7 @@ ai-engineering-cookbook prompt-optimizer
 | **🛡️ [Agent Security](./docs/agent-security.md)** | Stopping an agent from being turned against you by the text it reads. | Prompt injection, the lethal trifecta, reviewing a skill before you install it, scanning a skill for invisible instructions |
 | **🔗 [Doc Coherence Skill](./docs/doc-coherence.md)** | Single-source-of-truth registry + CI gate that flags cross-doc drift. Install via [Installable Skills](#-installable-skills). | Canonical owners, authority order, deterministic gate |
 | **🔍 [Skill Review Skill](./docs/skill-review.md)** | Checking a `SKILL.md` before you trust it, and writing one that works in every tool. Install via [Installable Skills](#-installable-skills). | The six portable fields, hidden characters, the `check-skills` gate |
+| **📡 [Agent Tracing Skill](./docs/agent-tracing.md)** | Seeing what an agent actually did — spans, token cost, and which skill it loaded. Install via [Installable Skills](#-installable-skills). | OTel GenAI conventions, `gen_ai.skill.*`, the `check-semconv` gate |
 | **🔧 [Troubleshooting](./docs/troubleshooting.md)** | Common failure scenarios and step-by-step fixes. | Install errors, TDD issues, phantom completions |
 | **🧱 [Toolchain & Node Baseline](./docs/toolchain.md)** | Which Node.js version this repo needs, and why every CI tool is pinned. | Node baseline, pinned CI tools, the `check:toolchain` gate |
 | **🔒 [Security Policy](./SECURITY.md)** | What counts as a vulnerability here and how to report one privately. | Private reporting, scope, dry-running an installer |
@@ -216,9 +221,9 @@ To prevent the same concept being called different things across docs, these are
 | Term | Means | Not to be confused with |
 | :--- | :--- | :--- |
 | **Spec-Kit** | The product/methodology for spec-driven development. | — |
-| **specify-cli** | The CLI package that installs Spec-Kit (`uv tool install specify-cli`). | the `/speckit.*` commands |
+| **specify-cli** | The CLI package that installs Spec-Kit (`uv tool install specify-cli`). | the `/speckit-*` skills |
 | **`.specify/`** | The directory Spec-Kit creates for specs, plans, tasks, and constitution. | specify-cli (the tool) |
-| **`/speckit.*`** | The slash commands (`/speckit.specify`, `/speckit.plan`, …). | specify-cli (the tool) |
+| **`/speckit-*`** | The Spec-Kit **agent skills** you type in your agent's chat (`/speckit-specify`, `/speckit-plan`, …). The prefix varies by agent — see [Installation](./docs/installation.md#the-prefix-depends-on-your-agent). | specify-cli (the tool); terminal commands |
 | **Superpowers** | The Claude Code plugin (`/plugin install superpowers@…`) providing TDD/worktree skills. | this repo's local `skills/` |
 | **The Five Principles** | The *philosophy* (why) — authored in this README. | the Five Directives |
 | **The Five Directives** | The *operational rules* (how) — authored in [CLAUDE.md](./CLAUDE.md) §5. | the Five Principles |

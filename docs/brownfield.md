@@ -15,11 +15,11 @@ sequenceDiagram
 
     Developer->>Agent: Run CI / Test suite (Ensure green baseline)
     Developer->>Agent: Run Brownfield Bootstrap & Risk Assessment
-    Developer->>Agent: /speckit.constitution (Capture constraints)
-    Developer->>Agent: /speckit.specify (Define feature delta)
-    Developer->>Agent: /speckit.clarify (Check backward compatibility)
-    Developer->>Agent: /speckit.plan (Design without adding new deps)
-    Developer->>Agent: /speckit.tasks (Generate tasks.md)
+    Developer->>Agent: /speckit-constitution (Capture constraints)
+    Developer->>Agent: /speckit-specify (Define feature delta)
+    Developer->>Agent: /speckit-clarify (Check backward compatibility — optional gate)
+    Developer->>Agent: /speckit-plan (Design without adding new deps)
+    Developer->>Agent: /speckit-tasks (Generate tasks.md)
     Developer->>Agent: Paste Brownfield Handoff Message
     Agent->>Superpowers: Verify tests run green before edit
     Agent->>Superpowers: TDD Loop (RED -> GREEN -> REFACTOR)
@@ -71,7 +71,7 @@ Next, run the risk assessment tool to identify fragile modules:
 Capture constraints discovered in Step 1. Save these in `.specify/memory/constitution.md`.
 
 ```
-/speckit.constitution Capture our existing project constraints:
+/speckit-constitution Capture our existing project constraints:
   - Tech stack: Node.js 20, Express 4.x, PostgreSQL via Knex.js
   - Do not modify: src/database/migrations/ (DBA approval required)
   - Testing: Jest with Supertest for API integration tests
@@ -86,7 +86,7 @@ Capture constraints discovered in Step 1. Save these in `.specify/memory/constit
 Describe the feature not as a greenfield application, but as a change to the current system.
 
 ```
-/speckit.specify Add user authentication using JWT tokens.
+/speckit-specify Add user authentication using JWT tokens.
 Extend the existing User model schema.
 Users log in by POSTing email/password to /auth/login.
 On successful login, return a JWT token in an httpOnly cookie.
@@ -102,7 +102,7 @@ On failed login, return 401 without revealing if the email exists.
 Focus questions on backward-compatibility, token expiry, database migration scripts, and SDK behaviors.
 
 ```
-/speckit.clarify
+/speckit-clarify
 ```
 
 ---
@@ -112,7 +112,7 @@ Focus questions on backward-compatibility, token expiry, database migration scri
 Specify that the agent must use the existing db clients and libraries, and must avoid introducing new packages unless approved.
 
 ```
-/speckit.plan Use existing libraries (bcryptjs, jsonwebtoken) already in package.json.
+/speckit-plan Use existing libraries (bcryptjs, jsonwebtoken) already in package.json.
 ```
 
 *Creates: `.specify/specs/001-user-auth/plan.md`*
@@ -122,7 +122,7 @@ Specify that the agent must use the existing db clients and libraries, and must 
 ### Step 6: Generate Tasks
 
 ```
-/speckit.tasks
+/speckit-tasks
 ```
 
 *Creates: `.specify/specs/001-user-auth/tasks.md`*
